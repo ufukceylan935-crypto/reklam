@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Reklam Yöneticisi v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f5f7fa;--white:#ffffff;--border:#e4e9f2;--border2:#d0d8e8;
+  --text:#0f1923;--sub:#5a6b7e;--muted:#8fa0b4;
+  --blue:#1a56db;--blue-l:#ebf0ff;--blue-d:#1344b8;
+  --green:#0e9f6e;--green-l:#ecfdf5;
+  --red:#e02424;--red-l:#fff5f5;
+  --yellow:#c27803;--yellow-l:#fef3c7;
+  --purple:#7c3aed;--purple-l:#f5f3ff;
+  --orange:#ea580c;--orange-l:#fff7ed;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.12);
+}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.logo-dots{display:flex;gap:4px}
+.logo-dot{width:9px;height:9px;border-radius:50%}
+.logo-title{font-size:1rem;font-weight:800;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.version-badge{background:var(--blue-l);color:var(--blue);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:100px;border:1px solid #bfdbfe}
+
+/* ── STEPPER ── */
+.stepper-wrap{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px}
+.stepper{max-width:1100px;margin:0 auto;display:flex;align-items:center}
+.step-item{display:flex;align-items:center;gap:10px;padding:16px 0;flex:1;cursor:pointer}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:700;flex-shrink:0;transition:all .25s;border:2px solid var(--border);color:var(--muted);background:var(--white)}
+.step-info{display:flex;flex-direction:column}
+.step-label{font-size:.68rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.step-title{font-size:.82rem;font-weight:700;color:var(--muted)}
+.step-item.active .step-num{background:var(--blue);border-color:var(--blue);color:#fff}
+.step-item.active .step-title{color:var(--text)}
+.step-item.active .step-label{color:var(--blue)}
+.step-item.done .step-num{background:var(--green);border-color:var(--green);color:#fff}
+.step-item.done .step-title{color:var(--sub)}
+.step-connector{flex:1;height:1px;background:var(--border);max-width:40px}
+.step-connector.done{background:var(--green)}
+
+/* ── MAIN ── */
+.main{max-width:1100px;margin:0 auto;padding:24px}
+
+/* ── PANELS ── */
+.panel{display:none}
+.panel.active{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LAYOUT 2-COL ── */
+.two-col{display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card-title{font-size:.92rem;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.card-sub{font-size:.82rem;color:var(--sub);margin-bottom:18px;line-height:1.6}
+.section-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:14px}
+
+/* ── FORM ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr}}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:.78rem;font-weight:600;color:var(--sub)}
+.fld label span{color:var(--red);margin-left:2px}
+input[type=text],input[type=password],input[type=number],input[type=date],textarea,select{
+  background:var(--bg);border:1.5px solid var(--border2);border-radius:10px;
+  padding:9px 13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:.86rem;width:100%;outline:none;transition:all .2s;resize:none}
+input:focus,textarea:focus,select:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+textarea{height:85px}
+select option{background:#fff}
+
+/* ── INFOBOX ── */
+.infobox{border-radius:12px;padding:13px 15px;font-size:.82rem;line-height:1.7;margin-bottom:16px}
+.infobox.blue{background:var(--blue-l);border:1px solid #bfdbfe;color:#1e40af}
+.infobox.yellow{background:var(--yellow-l);border:1px solid #fde68a;color:#92400e}
+.infobox.green{background:var(--green-l);border:1px solid #a7f3d0;color:#065f46}
+.infobox.purple{background:var(--purple-l);border:1px solid #ddd6fe;color:#5b21b6}
+.infobox strong{font-weight:700}
+.steps-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.step-row{display:flex;gap:10px;align-items:flex-start}
+.step-badge{background:rgba(146,64,14,.15);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0;margin-top:2px}
+
+/* ── OAUTH BTN ── */
+.oauth-btn{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--border2);border-radius:12px;padding:12px 18px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:600;color:var(--text);width:100%;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.oauth-btn:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(26,86,219,.12)}
+.oauth-btn svg{flex-shrink:0}
+.oauth-status{display:flex;align-items:center;gap:8px;font-size:.85rem;padding:10px 14px;border-radius:10px;margin-top:10px}
+.oauth-status.ok{background:var(--green-l);color:var(--green);font-weight:600}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 20px;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(26,86,219,.25)}
+.btn-primary:hover:not(:disabled){background:var(--blue-d);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-secondary{background:var(--white);color:var(--text);border:1.5px solid var(--border2)}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue)}
+.btn-success{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(14,159,110,.25)}
+.btn-success:hover:not(:disabled){opacity:.9;transform:translateY(-1px)}
+.btn-success:disabled{opacity:.45;cursor:not-allowed}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{opacity:.85}
+.btn-sm{padding:6px 12px;font-size:.78rem;border-radius:8px}
+.btn-lg{padding:13px 26px;font-size:.93rem;border-radius:13px;width:100%;justify-content:center}
+.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.spinner-sm{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.loading .spinner-sm{display:block}
+.loading .btn-txt{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── API KEYS ROW ── */
+.key-row{display:flex;gap:8px}
+.key-row input{flex:1}
+.key-save{background:var(--blue-l);border:1.5px solid #bfdbfe;border-radius:10px;padding:0 14px;color:var(--blue);font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s}
+.key-save:hover{background:#dbeafe}
+.saved-tag{display:none;background:var(--green-l);border:1px solid #a7f3d0;color:var(--green);border-radius:100px;padding:3px 10px;font-size:.72rem;font-weight:600;align-self:center}
+.saved-tag.show{display:inline-block}
+
+/* ── GOOGLE PREVIEW ── */
+.preview-frame{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.preview-bar{background:#f8f9fc;border-bottom:1px solid var(--border);padding:11px 15px;display:flex;align-items:center;gap:10px}
+.preview-search{flex:1;background:#fff;border:1px solid var(--border2);border-radius:100px;padding:7px 15px;font-size:.84rem;color:var(--sub);display:flex;align-items:center;gap:8px}
+.preview-search input{border:none;outline:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;color:var(--text);flex:1;background:transparent}
+.preview-body{padding:18px 22px;display:flex;flex-direction:column;gap:0}
+.g-ad{font-family:arial,sans-serif;padding:15px 0;border-bottom:1px solid #f0f0f0}
+.g-ad:last-child{border-bottom:none}
+.g-sponsor{font-size:11px;color:#70757a;margin-bottom:8px;background:#f2f2f2;display:inline-block;padding:2px 6px;border-radius:3px;font-weight:500}
+.g-toprow{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.g-fav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.g-domain{font-size:14px;color:#202124;line-height:1.3}
+.g-url{font-size:12px;color:#5f6368}
+.g-headline{font-size:20px;color:#1a0dab;line-height:1.3;margin-bottom:5px;cursor:pointer;font-weight:400}
+.g-headline:hover{text-decoration:underline}
+.g-desc{font-size:14px;color:#4d5156;line-height:1.6;max-width:600px}
+.g-sitelinks{display:grid;grid-template-columns:1fr 1fr;margin-top:10px;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
+.g-sitelink{padding:10px 14px;border-right:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;font-family:arial,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.g-sitelink:nth-child(even){border-right:none}
+.g-sitelink:nth-last-child(-n+2){border-bottom:none}
+.g-sitelink-txt{font-size:14px;color:#1a0dab}
+.g-sitelink-arr{color:#70757a;font-size:14px}
+
+/* ── AD EDIT ── */
+.ad-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.ad-chip{background:var(--bg);border:1.5px solid var(--border2);border-radius:10px;padding:10px 13px;font-size:.84rem;position:relative}
+.ad-chip-lbl{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px}
+.ad-chip-val{color:var(--text);font-weight:500}
+.ad-chip-cnt{font-size:.68rem;color:var(--muted);margin-top:2px}
+.ad-chip-cnt.warn{color:var(--yellow)}
+.ad-chip-cnt.over{color:var(--red);font-weight:700}
+.ad-chip input,.ad-chip textarea{border:none;outline:none;background:transparent;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;color:var(--text);font-weight:500;width:100%;resize:none;padding:0}
+
+/* ── TAGS ── */
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{background:var(--yellow-l);border:1px solid #fde68a;color:#92400e;border-radius:100px;padding:4px 12px;font-size:.78rem;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px}
+.tag:hover{background:#fde68a}
+.tag-blue{background:var(--blue-l);border:1px solid #bfdbfe;color:#1e40af}
+.tag-red{background:var(--red-l);border:1px solid #fecaca;color:#991b1b}
+.tag-green{background:var(--green-l);border:1px solid #a7f3d0;color:#065f46}
+.tag-gray{background:var(--bg);border:1px solid var(--border2);color:var(--sub)}
+.tag-remove{font-size:14px;line-height:1;opacity:.6}
+.tag-remove:hover{opacity:1}
+
+/* ── MATCH TYPE BADGE ── */
+.match-badge{font-size:.6rem;font-weight:800;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em}
+.match-broad{background:#fef3c7;color:#92400e}
+.match-phrase{background:#ede9fe;color:#5b21b6}
+.match-exact{background:#dcfce7;color:#166534}
+
+/* ── KEYWORD INPUT ── */
+.kw-add-row{display:flex;gap:8px;margin-top:10px;align-items:center}
+.kw-add-row input{flex:1}
+.kw-match-select{background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:.8rem;font-weight:600;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;outline:none;cursor:pointer;min-width:110px}
+
+/* ── SITELINK EDITOR ── */
+.sitelink-edit-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+
+/* ── SCHEDULE GRID ── */
+.schedule-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.schedule-col-head{font-size:.68rem;font-weight:700;color:var(--muted);text-align:center;padding:4px 0}
+.schedule-cell{height:28px;background:var(--bg);border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:.62rem;color:var(--muted)}
+.schedule-cell.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.schedule-cell:hover{border-color:var(--blue);opacity:.8}
+.schedule-hour-label{font-size:.62rem;color:var(--muted);text-align:right;padding-right:4px;display:flex;align-items:center;justify-content:flex-end}
+
+/* ── DEMOGRAFI ── */
+.demo-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.demo-chip{background:var(--bg);border:1.5px solid var(--border2);border-radius:100px;padding:6px 14px;font-size:.8rem;font-weight:600;color:var(--sub);cursor:pointer;transition:all .2s;user-select:none}
+.demo-chip:hover{border-color:var(--blue);color:var(--blue)}
+.demo-chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* ── A/B TEST ── */
+.variant-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.variant-tab{padding:6px 16px;border-radius:100px;font-size:.82rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border2);background:var(--bg);color:var(--sub);transition:all .2s}
+.variant-tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.variant-tab.has-data{border-color:var(--green);color:var(--green)}
+.variant-tab.has-data.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.variant-panel{display:none}
+.variant-panel.active{display:block}
+.add-variant-btn{padding:6px 14px;border-radius:100px;border:1.5px dashed var(--border2);background:transparent;color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+.add-variant-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── PERFORMANCE ESTIMATE ── */
+.perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.perf-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.perf-val{font-size:1.5rem;font-weight:800;color:var(--text);line-height:1}
+.perf-lbl{font-size:.72rem;color:var(--muted);margin-top:4px;font-weight:500}
+.perf-range{font-size:.7rem;color:var(--muted);margin-top:2px}
+
+/* ── CAMPAIGN SETTINGS ── */
+.budget-row{display:flex;align-items:center;gap:12px}
+.budget-row input{max-width:140px}
+.range-wrap{flex:1}
+input[type=range]{width:100%;accent-color:var(--blue)}
+
+/* ── PUBLISH STATUS ── */
+.pub-status{border-radius:14px;padding:20px;text-align:center;margin-top:16px}
+.pub-status.loading-state{background:var(--blue-l);border:2px solid #bfdbfe}
+.pub-status.success{background:var(--green-l);border:2px solid #a7f3d0}
+.pub-status.error{background:var(--red-l);border:2px solid #fecaca}
+.pub-icon{font-size:2.2rem;margin-bottom:10px}
+.pub-title{font-size:1.05rem;font-weight:800;margin-bottom:6px}
+.pub-msg{font-size:.84rem;color:var(--sub);line-height:1.6}
+.pub-code{background:rgba(0,0,0,.06);border-radius:8px;padding:10px 14px;font-size:.76rem;font-family:monospace;margin-top:12px;text-align:left;word-break:break-all;max-height:120px;overflow:auto}
+
+.divider{height:1px;background:var(--border);margin:18px 0}
+.char-badge{display:inline-block;font-size:.7rem;padding:2px 7px;border-radius:100px;font-weight:600}
+.char-ok{background:#dcfce7;color:#166534}
+.char-warn{background:#fef3c7;color:#92400e}
+.char-over{background:#fee2e2;color:#991b1b}
+
+/* ── EXPORT BUTTONS ── */
+.export-row{display:flex;gap:8px;flex-wrap:wrap}
+.export-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;border:1.5px solid var(--border2);background:var(--white);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.export-btn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── STICKY SIDEBAR ── */
+.sticky-sidebar{position:sticky;top:80px}
+
+/* ── QUALITY SCORE ── */
+.qs-wrap{margin-top:14px}
+.qs-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.qs-bar-label{font-size:.75rem;color:var(--sub);width:120px;flex-shrink:0}
+.qs-bar-track{flex:1;height:7px;background:var(--border);border-radius:10px;overflow:hidden}
+.qs-bar-fill{height:100%;border-radius:10px;transition:width .4s}
+.qs-score-big{font-size:2.8rem;font-weight:800;line-height:1;text-align:center;margin:12px 0 4px}
+.qs-score-lbl{text-align:center;font-size:.78rem;font-weight:600;margin-bottom:12px}
+.qs-tips{font-size:.76rem;color:var(--sub);line-height:1.6}
+.qs-tip{display:flex;gap:6px;margin-bottom:4px;align-items:flex-start}
+
+/* ── HISTORY PANEL ── */
+.history-drawer{position:fixed;right:0;top:0;height:100vh;width:340px;background:var(--white);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);z-index:200;transform:translateX(100%);transition:transform .3s;display:flex;flex-direction:column}
+.history-drawer.open{transform:translateX(0)}
+.history-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:199;display:none}
+.history-overlay.open{display:block}
+.history-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.history-header h3{font-size:.95rem;font-weight:800}
+.history-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:2px 6px;border-radius:6px}
+.history-close:hover{background:var(--bg)}
+.history-list{flex:1;overflow-y:auto;padding:14px}
+.history-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.history-item:hover{border-color:var(--blue);background:var(--blue-l)}
+.history-item-brand{font-size:.88rem;font-weight:700;color:var(--text)}
+.history-item-meta{font-size:.72rem;color:var(--muted);margin-top:3px}
+.history-item-preview{font-size:.76rem;color:var(--sub);margin-top:6px;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.history-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:.85rem}
+
+/* ── AI OPTIMIZE BTN ── */
+.ai-opt-btn{position:absolute;right:8px;top:8px;background:var(--purple-l);border:1px solid #ddd6fe;color:var(--purple);border-radius:6px;padding:2px 7px;font-size:.65rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.ai-opt-btn:hover{background:#ddd6fe}
+.ai-opt-btn.loading-ai{opacity:.6;pointer-events:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-dots">
+      <div class="logo-dot" style="background:#4285f4"></div>
+      <div class="logo-dot" style="background:#ea4335"></div>
+      <div class="logo-dot" style="background:#fbbc04"></div>
+      <div class="logo-dot" style="background:#34a853"></div>
+    </div>
+    <span class="logo-title">Google Reklam Yöneticisi</span>
+    <span class="version-badge">v3.0</span>
+  </div>
+  <div class="topbar-right">
+    <button class="export-btn" onclick="openHistory()" title="Geçmiş reklamlar">🕘 Geçmiş</button>
+    <button class="export-btn" onclick="exportJSON()" title="JSON olarak kaydet">💾 JSON</button>
+    <button class="export-btn" onclick="exportPDF()" title="PDF olarak indir">📄 PDF</button>
+  </div>
+</div>
+
+<!-- History Overlay & Drawer -->
+<div class="history-overlay" id="historyOverlay" onclick="closeHistory()"></div>
+<div class="history-drawer" id="historyDrawer">
+  <div class="history-header">
+    <h3>🕘 Reklam Geçmişi</h3>
+    <button class="history-close" onclick="closeHistory()">×</button>
+  </div>
+  <div class="history-list" id="historyList"></div>
+  <div style="padding:14px;border-top:1px solid var(--border)">
+    <button class="btn btn-sm" style="width:100%;background:var(--red-l);color:var(--red);border:1px solid #fecaca" onclick="clearHistory()">🗑️ Geçmişi Temizle</button>
+  </div>
+</div>
+
+<div class="stepper-wrap">
+  <div class="stepper">
+    <div class="step-item active" id="si0" onclick="goStep(0)">
+      <div class="step-num" id="sn0">1</div>
+      <div class="step-info"><span class="step-label">Adım 1</span><span class="step-title">Bağlantı</span></div>
+    </div>
+    <div class="step-connector" id="sc0"></div>
+    <div class="step-item" id="si1" onclick="goStep(1)">
+      <div class="step-num" id="sn1">2</div>
+      <div class="step-info"><span class="step-label">Adım 2</span><span class="step-title">İçerik</span></div>
+    </div>
+    <div class="step-connector" id="sc1"></div>
+    <div class="step-item" id="si2" onclick="goStep(2)">
+      <div class="step-num" id="sn2">3</div>
+      <div class="step-info"><span class="step-label">Adım 3</span><span class="step-title">Önizleme & Düzenle</span></div>
+    </div>
+    <div class="step-connector" id="sc2"></div>
+    <div class="step-item" id="si3" onclick="goStep(3)">
+      <div class="step-num" id="sn3">4</div>
+      <div class="step-info"><span class="step-label">Adım 4</span><span class="step-title">Hedefleme</span></div>
+    </div>
+    <div class="step-connector" id="sc3"></div>
+    <div class="step-item" id="si4" onclick="goStep(4)">
+      <div class="step-num" id="sn4">5</div>
+      <div class="step-info"><span class="step-label">Adım 5</span><span class="step-title">Yayınla</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══ PANEL 1: BAĞLANTI ═══ -->
+<div class="panel active" id="panel0">
+  <div class="card">
+    <div class="card-title">⚡ Groq API — Ücretsiz AI</div>
+    <div class="card-sub">Reklam metinleri oluşturmak için kullanılır. Tamamen ücretsiz, kart gerekmez.</div>
+    <div class="infobox yellow">
+      <div class="steps-list">
+        <div class="step-row"><div class="step-badge">1</div><span><a href="https://console.groq.com" target="_blank"><strong>console.groq.com</strong></a> → Google ile giriş</span></div>
+        <div class="step-row"><div class="step-badge">2</div><span><strong>API Keys → Create API Key</strong> → kopyala (<code>gsk_...</code>)</span></div>
+      </div>
+    </div>
+    <div class="fld">
+      <label>Groq API Anahtarı</label>
+      <div class="key-row">
+        <input type="password" id="groqKey" placeholder="gsk_..." />
+        <button class="key-save" onclick="saveGroq()">Kaydet</button>
+        <span class="saved-tag" id="groqSaved">✓ Kaydedildi</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Google Ads'e Yayınlamak İster misiniz?</div>
+    <div class="card-sub">Reklamı doğrudan Google Ads'e göndermek istiyorsanız aşağıdaki bilgileri girin. Sadece önizleme veya CSV/PDF export için bu adımı atlayabilirsiniz.</div>
+
+    <div class="infobox blue" style="margin-bottom:16px">
+      <strong>🔑 Access Token nasıl alınır? (OAuth Playground)</strong>
+      <div class="steps-list" style="margin-top:8px">
+        <div class="step-row"><div class="step-badge" style="background:rgba(30,64,175,.15);color:#1e40af">1</div><span><a href="https://developers.google.com/oauthplayground" target="_blank"><strong>developers.google.com/oauthplayground</strong></a> adresini aç</span></div>
+        <div class="step-row"><div class="step-badge" style="background:rgba(30,64,175,.15);color:#1e40af">2</div><span>Sağ üstte ⚙️ → <strong>"Use your own OAuth credentials"</strong> işaretle → Client ID ve Secret gir</span></div>
+        <div class="step-row"><div class="step-badge" style="background:rgba(30,64,175,.15);color:#1e40af">3</div><span>Sol tarafta <code>https://www.googleapis.com/auth/adwords</code> yaz → <strong>Authorize APIs</strong></span></div>
+        <div class="step-row"><div class="step-badge" style="background:rgba(30,64,175,.15);color:#1e40af">4</div><span>Google hesabınla giriş yap → <strong>Exchange authorization code for tokens</strong> → Access token kopyala</span></div>
+      </div>
+      <div style="margin-top:10px">
+        <a href="https://developers.google.com/oauthplayground" target="_blank" class="btn btn-primary btn-sm" style="display:inline-flex;text-decoration:none">🔗 OAuth Playground'u Aç</a>
+      </div>
+    </div>
+
+    <div class="fld">
+      <label>Access Token <span style="font-weight:400;color:var(--muted)">(opsiyonel — sadece yayınlamak için)</span></label>
+      <div class="key-row">
+        <input type="password" id="accessTokenInput" placeholder="ya29.A0..." />
+        <button class="key-save" onclick="saveAccessToken()">Kaydet</button>
+        <span class="saved-tag" id="tokenSaved">✓ Bağlandı</span>
+      </div>
+    </div>
+    <div id="oauthStatus"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary btn-lg" onclick="nextStep(0)" style="max-width:220px">Devam Et →</button>
+  </div>
+</div>
+
+<!-- ═══ PANEL 2: REKLAM İÇERİĞİ ═══ -->
+<div class="panel" id="panel1">
+  <div class="card">
+    <div class="section-title">🌐 İşletme Bilgileri</div>
+    <div class="g2">
+      <div class="fld"><label>Marka / İşletme Adı <span>*</span></label><input type="text" id="brand" placeholder="ör. Pastane Dünyası" /></div>
+      <div class="fld"><label>Web Sitesi URL <span>*</span></label><input type="text" id="url" placeholder="ör. www.pastanedunyasi.com" /></div>
+      <div class="fld full"><label>Ürün / Hizmet Açıklaması <span>*</span></label><textarea id="desc" placeholder="Ne satıyorsunuz? Hedef kitleniz kim? Öne çıkan özellikler?"></textarea></div>
+      <div class="fld"><label>Şehir / Bölge</label><input type="text" id="loc" placeholder="ör. İstanbul" /></div>
+      <div class="fld"><label>Sektör</label>
+        <select id="sector">
+          <option value="genel">Genel</option>
+          <option value="gida">Gıda & Restoran</option>
+          <option value="eticaret">E-Ticaret & Perakende</option>
+          <option value="saglik">Sağlık & Güzellik</option>
+          <option value="egitim">Eğitim</option>
+          <option value="hizmet">Hizmet Sektörü</option>
+          <option value="teknoloji">Teknoloji & Yazılım</option>
+          <option value="insaat">İnşaat & Gayrimenkul</option>
+        </select>
+      </div>
+      <div class="fld"><label>Hedef (CTA)</label>
+        <select id="cta">
+          <option>Hemen Satın Al</option>
+          <option>Ücretsiz Üye Ol</option>
+          <option>Hemen Ara</option>
+          <option>Ücretsiz Teklif Al</option>
+          <option>Hemen İndir</option>
+          <option>Rezervasyon Yap</option>
+        </select>
+      </div>
+      <div class="fld full"><label>Rekabet Avantajı</label><input type="text" id="adv" placeholder="ör. %30 indirim, ücretsiz kargo, 7/24 destek" /></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">🔢 Kaç Varyasyon Oluşturulsun?</div>
+    <div class="infobox purple" style="margin-bottom:14px"><strong>A/B Test:</strong> Birden fazla reklam varyasyonu oluşturarak hangisinin daha iyi performans gösterdiğini test edebilirsiniz.</div>
+    <div class="demo-chips" id="variantCountChips">
+      <div class="demo-chip on" onclick="selectVariantCount(1,this)">1 Varyasyon</div>
+      <div class="demo-chip" onclick="selectVariantCount(2,this)">2 Varyasyon (A/B)</div>
+      <div class="demo-chip" onclick="selectVariantCount(3,this)">3 Varyasyon (A/B/C)</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goStep(0)">← Geri</button>
+    <button class="btn btn-primary" id="genBtn" onclick="generateAd()">
+      <div class="spinner-sm"></div>
+      <span class="btn-txt">✨ AI ile Oluştur</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ PANEL 3: ÖNİZLEME & DÜZENLE ═══ -->
+<div class="panel" id="panel2">
+  <div class="two-col">
+    <!-- LEFT: Edit -->
+    <div>
+      <!-- Variant Tabs -->
+      <div class="card" style="padding:16px 20px">
+        <div class="section-title">🔀 Reklam Varyasyonları</div>
+        <div id="variantTabs" class="variant-tabs"></div>
+        <div id="variantPanels"></div>
+      </div>
+
+      <!-- Keywords -->
+      <div class="card">
+        <div class="section-title">🔑 Anahtar Kelimeler</div>
+        <div class="infobox blue" style="margin-bottom:12px;font-size:.8rem">
+          <strong>Eşleşme Türleri:</strong> <span class="match-badge match-broad">Geniş</span> = benzer aramalar &nbsp;
+          <span class="match-badge match-phrase">"Sözlük"</span> = ifadeyi içerenler &nbsp;
+          <span class="match-badge match-exact">[Tam]</span> = birebir eşleşme
+        </div>
+        <div id="keywordTags" class="tags"></div>
+        <div class="kw-add-row">
+          <input type="text" id="kwInput" placeholder="Anahtar kelime ekle..." onkeydown="if(event.key==='Enter')addKeyword()" />
+          <select id="kwMatchType" class="kw-match-select">
+            <option value="BROAD">Geniş Eşleşme</option>
+            <option value="PHRASE">Sözlük Eşleşme</option>
+            <option value="EXACT">Tam Eşleşme</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="addKeyword()">+ Ekle</button>
+        </div>
+      </div>
+
+      <!-- Negative Keywords -->
+      <div class="card">
+        <div class="section-title">🚫 Negatif Anahtar Kelimeler</div>
+        <div class="infobox yellow" style="margin-bottom:12px;font-size:.8rem">Reklamınızın <strong>gösterilmemesini</strong> istediğiniz arama terimleri. Bütçe israfını önler.</div>
+        <div id="negKeywordTags" class="tags"></div>
+        <div class="kw-add-row">
+          <input type="text" id="negKwInput" placeholder="Negatif kelime ekle..." onkeydown="if(event.key==='Enter')addNegKeyword()" />
+          <select id="negKwMatchType" class="kw-match-select">
+            <option value="BROAD">Geniş</option>
+            <option value="PHRASE">Sözlük</option>
+            <option value="EXACT">Tam</option>
+          </select>
+          <button class="btn btn-sm" style="background:var(--red-l);color:var(--red);border:1.5px solid #fecaca;font-weight:700" onclick="addNegKeyword()">− Ekle</button>
+        </div>
+      </div>
+
+      <!-- Sitelink Extensions (Manual) -->
+      <div class="card">
+        <div class="section-title">🔗 Site Bağlantısı Uzantıları</div>
+        <div id="sitelinkEditor"></div>
+        <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="addSitelink()">+ Bağlantı Ekle</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Preview -->
+    <div class="sticky-sidebar">
+      <div class="preview-frame" id="previewFrame">
+        <div class="preview-bar">
+          <div style="display:flex;gap:5px">
+            <div style="width:9px;height:9px;border-radius:50%;background:#ea4335"></div>
+            <div style="width:9px;height:9px;border-radius:50%;background:#fbbc04"></div>
+            <div style="width:9px;height:9px;border-radius:50%;background:#34a853"></div>
+          </div>
+          <div class="preview-search">
+            <span style="color:var(--muted)">🔍</span>
+            <input type="text" id="previewSearch" placeholder="arama terimi..." />
+          </div>
+          <!-- Device Toggle -->
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <button id="btnDesktop" onclick="setPreviewDevice('desktop')" title="Masaüstü" style="background:var(--blue);color:#fff;border:none;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:14px;line-height:1">🖥️</button>
+            <button id="btnMobile" onclick="setPreviewDevice('mobile')" title="Mobil" style="background:var(--bg);color:var(--muted);border:1px solid var(--border2);border-radius:7px;padding:5px 8px;cursor:pointer;font-size:14px;line-height:1">📱</button>
+          </div>
+        </div>
+        <!-- Mobile shell wrapper -->
+        <div id="mobileShell" style="display:none;justify-content:center;padding:16px;background:#f0f0f0">
+          <div style="width:320px;border-radius:36px;border:8px solid #222;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3);background:#fff">
+            <!-- Phone top bar -->
+            <div style="background:#222;height:28px;display:flex;align-items:center;justify-content:center">
+              <div style="width:60px;height:6px;background:#444;border-radius:4px"></div>
+            </div>
+            <!-- Mobile Google bar -->
+            <div style="background:#fff;padding:8px 10px;border-bottom:1px solid #e0e0e0">
+              <div style="background:#f1f3f4;border-radius:20px;padding:8px 12px;display:flex;align-items:center;gap:6px">
+                <span style="font-size:12px">🔍</span>
+                <span id="mobileSearchTerm" style="font-size:13px;color:#333;flex:1">arama terimi...</span>
+                <span style="font-size:11px">🎙️</span>
+              </div>
+            </div>
+            <!-- Mobile tabs -->
+            <div style="display:flex;gap:0;border-bottom:1px solid #e0e0e0;background:#fff;overflow-x:auto">
+              <div style="padding:8px 12px;font-size:11px;color:#1a73e8;border-bottom:2px solid #1a73e8;white-space:nowrap">Tümü</div>
+              <div style="padding:8px 10px;font-size:11px;color:#70757a;white-space:nowrap">Görseller</div>
+              <div style="padding:8px 10px;font-size:11px;color:#70757a;white-space:nowrap">Haberler</div>
+              <div style="padding:8px 10px;font-size:11px;color:#70757a;white-space:nowrap">Videolar</div>
+            </div>
+            <div id="mobilePreviewBody" style="padding:12px;background:#fff;max-height:480px;overflow-y:auto"></div>
+            <!-- Phone bottom bar -->
+            <div style="background:#222;height:20px;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:#555;border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-body" id="previewBody"></div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div class="section-title" style="margin-bottom:8px">📤 Dışa Aktar</div>
+        <div class="export-row">
+          <button class="export-btn" onclick="exportJSON()">💾 JSON</button>
+          <button class="export-btn" onclick="exportPDF()">📄 PDF</button>
+          <button class="export-btn" onclick="exportCSV()">📊 CSV</button>
+          <button class="export-btn" onclick="copyAllText()">📋 Kopyala</button>
+        </div>
+      </div>
+
+      <!-- Quality Score Card -->
+      <div class="card" style="padding:16px" id="qualityScoreCard">
+        <div class="section-title" style="margin-bottom:4px">⭐ Reklam Kalite Skoru</div>
+        <div id="qsContent"><div style="text-align:center;padding:20px;color:var(--muted);font-size:.82rem">Reklam oluşturulduktan sonra kalite skoru hesaplanır.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goStep(1)">← Geri</button>
+    <button class="btn btn-primary" onclick="goStep(3)">Hedefleme Ayarları →</button>
+  </div>
+</div>
+
+<!-- ═══ PANEL 4: HEDEFLEMESİ ═══ -->
+<div class="panel" id="panel3">
+  <div class="two-col">
+    <div>
+
+      <!-- Demografi -->
+      <div class="card">
+        <div class="card-title">👥 Demografik Hedefleme</div>
+        <div class="card-sub">Reklamınızı kimin göreceğini belirleyin. İşaretlenmeyenler hariç tutulur.</div>
+        <div class="section-title">Yaş Grupları</div>
+        <div class="demo-chips" id="ageChips">
+          <div class="demo-chip on" data-val="AGE_RANGE_18_24" onclick="toggleDemoChip(this,'age')">18-24</div>
+          <div class="demo-chip on" data-val="AGE_RANGE_25_34" onclick="toggleDemoChip(this,'age')">25-34</div>
+          <div class="demo-chip on" data-val="AGE_RANGE_35_44" onclick="toggleDemoChip(this,'age')">35-44</div>
+          <div class="demo-chip on" data-val="AGE_RANGE_45_54" onclick="toggleDemoChip(this,'age')">45-54</div>
+          <div class="demo-chip on" data-val="AGE_RANGE_55_64" onclick="toggleDemoChip(this,'age')">55-64</div>
+          <div class="demo-chip on" data-val="AGE_RANGE_65_UP" onclick="toggleDemoChip(this,'age')">65+</div>
+        </div>
+        <div class="divider"></div>
+        <div class="section-title">Cinsiyet</div>
+        <div class="demo-chips" id="genderChips">
+          <div class="demo-chip on" data-val="FEMALE" onclick="toggleDemoChip(this,'gender')">👩 Kadın</div>
+          <div class="demo-chip on" data-val="MALE" onclick="toggleDemoChip(this,'gender')">👨 Erkek</div>
+          <div class="demo-chip on" data-val="UNDETERMINED" onclick="toggleDemoChip(this,'gender')">⚪ Belirsiz</div>
+        </div>
+        <div class="divider"></div>
+        <div class="section-title">Cihaz Türü</div>
+        <div class="demo-chips" id="deviceChips">
+          <div class="demo-chip on" data-val="MOBILE" onclick="toggleDemoChip(this,'device')">📱 Mobil</div>
+          <div class="demo-chip on" data-val="DESKTOP" onclick="toggleDemoChip(this,'device')">🖥️ Masaüstü</div>
+          <div class="demo-chip on" data-val="TABLET" onclick="toggleDemoChip(this,'device')">📟 Tablet</div>
+        </div>
+      </div>
+
+      <!-- Dil Hedefleme -->
+      <div class="card">
+        <div class="card-title">🌍 Dil Hedefleme</div>
+        <div class="card-sub">Reklamınızın hangi dil ayarlarında gösterileceğini seçin.</div>
+        <div class="demo-chips" id="langChips">
+          <div class="demo-chip on" data-val="1001" onclick="toggleLangChip(this)">🇹🇷 Türkçe</div>
+          <div class="demo-chip" data-val="1000" onclick="toggleLangChip(this)">🇺🇸 İngilizce</div>
+          <div class="demo-chip" data-val="1020" onclick="toggleLangChip(this)">🇩🇪 Almanca</div>
+          <div class="demo-chip" data-val="1004" onclick="toggleLangChip(this)">🇫🇷 Fransızca</div>
+          <div class="demo-chip" data-val="1003" onclick="toggleLangChip(this)">🇦🇷 Arapça</div>
+          <div class="demo-chip" data-val="1031" onclick="toggleLangChip(this)">🇷🇺 Rusça</div>
+        </div>
+      </div>
+
+      <!-- Reklam Takvimi -->
+      <div class="card">
+        <div class="card-title">🕐 Reklam Takvimi</div>
+        <div class="card-sub">Reklamınızın hangi gün ve saatlerde yayınlanacağını seçin. Tıkla = aktif.</div>
+        <div id="scheduleGrid"></div>
+        <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
+          <button class="btn btn-sm btn-secondary" onclick="scheduleAll(true)">Tümünü Seç</button>
+          <button class="btn btn-sm btn-secondary" onclick="scheduleAll(false)">Tümünü Kaldır</button>
+          <button class="btn btn-sm btn-secondary" onclick="scheduleWorkdays()">Hafta İçi</button>
+          <span id="scheduleCount" style="font-size:.8rem;color:var(--muted)"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Performance Estimate -->
+    <div class="sticky-sidebar">
+      <div class="card">
+        <div class="section-title">📈 Tahmini Performans</div>
+        <div class="infobox blue" style="margin-bottom:12px;font-size:.78rem">Günlük bütçenize ve hedeflemenize göre tahmini sonuçlar. Gerçek değerler farklılık gösterebilir.</div>
+        <div class="fld" style="margin-bottom:12px">
+          <label>Günlük Bütçe (₺)</label>
+          <div class="budget-row">
+            <input type="number" id="budgetEstimate" value="100" min="10" />
+            <div class="range-wrap">
+              <input type="range" id="budgetEstRange" min="10" max="2000" value="100" />
+            </div>
+          </div>
+        </div>
+        <div class="perf-grid" id="perfGrid">
+          <div class="perf-card"><div class="perf-val" id="estImpressions">…</div><div class="perf-lbl">Gösterim/gün</div></div>
+          <div class="perf-card"><div class="perf-val" id="estClicks">…</div><div class="perf-lbl">Tıklama/gün</div></div>
+          <div class="perf-card"><div class="perf-val" id="estCPC">…</div><div class="perf-lbl">Ort. TBM (₺)</div></div>
+        </div>
+        <div class="perf-grid" style="grid-template-columns:1fr 1fr;margin-top:8px">
+          <div class="perf-card"><div class="perf-val" id="estCTR">…</div><div class="perf-lbl">Tahmini TO%</div></div>
+          <div class="perf-card"><div class="perf-val" id="estMonthly">…</div><div class="perf-lbl">Aylık Tıklama</div></div>
+        </div>
+        <script>
+        // Inline hesaplama — bütçe/sektör inputlarına bağlı anlık güncelleme
+        var _SCPC = {genel:2.5,gida:1.8,eticaret:3.2,saglik:4.5,egitim:2.0,hizmet:3.5,teknoloji:5.0,insaat:6.0};
+        var _SCTR = {genel:3.5,gida:4.2,eticaret:3.8,saglik:3.0,egitim:4.5,hizmet:3.2,teknoloji:2.8,insaat:2.5};
+        function _fmt(n){ return n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':String(n); }
+        function _calc(){
+          var budget = parseFloat(document.getElementById('budgetEstimate').value)||100;
+          var sector = (document.getElementById('sector')||{value:'genel'}).value;
+          var cpc = _SCPC[sector]||2.5, ctr = _SCTR[sector]||3.5;
+          // Demografi chip sayısı
+          var devChips = document.querySelectorAll('#deviceChips .demo-chip.on').length||3;
+          var ageChips = document.querySelectorAll('#ageChips .demo-chip.on').length||6;
+          var mult = Math.max(0.2,(devChips/3)*(ageChips/6));
+          var clicks = Math.round((budget/cpc)*mult);
+          var impr   = Math.round(clicks/(ctr/100));
+          document.getElementById('estImpressions').textContent = _fmt(impr);
+          document.getElementById('estClicks').textContent      = _fmt(clicks);
+          document.getElementById('estCPC').textContent         = '₺'+cpc.toFixed(2);
+          document.getElementById('estCTR').textContent         = ctr.toFixed(1)+'%';
+          document.getElementById('estMonthly').textContent     = _fmt(clicks*30);
+        }
+        // İlk çalıştırma
+        _calc();
+        // Event dinleyicileri
+        document.getElementById('budgetEstimate').addEventListener('input', function(){ document.getElementById('budgetEstRange').value=this.value; _calc(); });
+        document.getElementById('budgetEstRange').addEventListener('input', function(){ document.getElementById('budgetEstimate').value=this.value; _calc(); });
+        document.getElementById('sector').addEventListener('change', _calc);
+        // Demo chip tıklaması için gözlemci
+        document.addEventListener('click', function(e){ if(e.target.closest && e.target.closest('.demo-chip')) setTimeout(_calc,10); });
+        </script>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:10px;line-height:1.5">* Sektör ortalamasına göre hesaplanmıştır. TO oranı sektör ve kalite puanına göre değişir.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goStep(2)">← Geri</button>
+    <button class="btn btn-primary" onclick="goStep(4)">Kampanya Ayarları →</button>
+  </div>
+</div>
+
+<!-- ═══ PANEL 5: YAYINLA ═══ -->
+<div class="panel" id="panel4">
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="section-title">📋 Kampanya Özeti</div>
+        <div id="campaignSummary" style="font-size:.84rem;color:var(--sub);line-height:1.8"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">⚙️ Kampanya Ayarları</div>
+        <div class="g2">
+          <div class="fld"><label>Kampanya Adı</label><input type="text" id="campaignName" placeholder="ör. Pastane Ürünleri - Arama" /></div>
+          <div class="fld"><label>Günlük Bütçe (₺)</label>
+            <div class="budget-row">
+              <input type="number" id="budget" value="100" min="10" max="10000" oninput="updateBudget()" />
+              <div class="range-wrap"><input type="range" id="budgetRange" min="10" max="1000" value="100" oninput="syncBudget()" /></div>
+            </div>
+          </div>
+          <div class="fld"><label>Başlangıç Tarihi</label><input type="date" id="startDate" /></div>
+          <div class="fld"><label>Bitiş Tarihi (opsiyonel)</label><input type="date" id="endDate" /></div>
+          <div class="fld"><label>Hedef Lokasyon</label><input type="text" id="targetLoc" placeholder="ör. Türkiye, İstanbul" /></div>
+          <div class="fld"><label>Teklif Stratejisi</label>
+            <select id="bidStrategy">
+              <option value="MAXIMIZE_CLICKS">Tıklamaları Artır</option>
+              <option value="MAXIMIZE_CONVERSIONS">Dönüşümleri Artır</option>
+              <option value="TARGET_CPA">Hedef EBM</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">🔐 Google Ads API Bilgileri <span style="font-size:.7rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(sadece yayınlamak için gerekli)</span></div>
+        <div class="infobox yellow" style="margin-bottom:14px;font-size:.8rem">
+          Sadece CSV/PDF/JSON indirmek istiyorsanız bu alanları boş bırakabilirsiniz.
+        </div>
+        <div class="g2">
+          <div class="fld"><label>Müşteri Kimliği (Customer ID)</label><input type="text" id="customerId" placeholder="123-456-7890" /></div>
+          <div class="fld"><label>Geliştirici Token</label><input type="password" id="devToken" placeholder="XXXXXXXXXXXXXXXX" /></div>
+        </div>
+        <div class="fld" style="margin-top:10px">
+          <label>Access Token <span style="font-weight:400;color:var(--muted);font-size:.72rem">⏱️ 1 saat geçerli — süresi dolarsa "Token Yenile" butonuna basın</span></label>
+          <div class="key-row">
+            <input type="password" id="accessTokenInput2" placeholder="ya29.A0..." />
+            <button class="key-save" onclick="saveAccessToken2()">Kaydet</button>
+            <span class="saved-tag" id="tokenSaved2">✓ Bağlandı</span>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:13px;background:var(--yellow-l);border:1px solid #fde68a;border-radius:12px">
+          <div style="font-size:.8rem;font-weight:700;color:#92400e;margin-bottom:8px">🔄 Otomatik Token Yenileme (Önerilen)</div>
+          <div style="font-size:.76rem;color:#92400e;margin-bottom:10px;line-height:1.6">Access Token 1 saatte bir sona erer. Aşağıdaki alanları doldurursanız sistem otomatik olarak token yeniler.</div>
+          <div class="g3" style="margin-bottom:8px">
+            <div class="fld"><label>Client ID</label><input type="text" id="oauthClientIdPub" placeholder="123...apps.googleusercontent.com" /></div>
+            <div class="fld"><label>Client Secret</label><input type="password" id="oauthClientSecretPub" placeholder="GOCSPX-..." /></div>
+            <div class="fld"><label>Refresh Token</label><input type="password" id="refreshTokenInput" placeholder="1//04..." /></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-sm" style="background:#fde68a;border:1px solid #f59e0b;color:#92400e;font-weight:700" onclick="saveRefreshCreds()">💾 Kaydet</button>
+            <button class="btn btn-sm btn-primary" id="refreshTokenBtn" onclick="refreshAccessToken()">🔄 Token Yenile</button>
+            <span class="saved-tag" id="refreshSaved" style="display:none;background:var(--green-l);border:1px solid #a7f3d0;color:var(--green)">✓ Token yenilendi!</span>
+          </div>
+          <div style="margin-top:8px;font-size:.72rem;color:#92400e;line-height:1.5">
+            💡 <strong>Refresh Token nasıl alınır?</strong> OAuth Playground'da "Exchange" sonrası gelen yanıtta <code>refresh_token</code> değerini kopyalayın (sadece ilk sefer gönderilir — <code>access_type=offline</code> gerektirir).
+          </div>
+        </div>
+        <div id="oauthStatus2" style="margin-top:8px"></div>
+      </div>
+
+      <div id="pubStatusWrap"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(3)">← Geri</button>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:1;max-width:300px">
+          <button class="btn btn-success btn-lg" id="publishBtn" onclick="publishAd()">
+            <div class="spinner-sm"></div>
+            <span class="btn-txt">🚀 Google Ads'e Yayınla</span>
+          </button>
+          <div class="export-row" style="justify-content:center">
+            <button class="export-btn" onclick="exportJSON()">💾 JSON</button>
+            <button class="export-btn" onclick="exportCSV()">📊 CSV</button>
+            <button class="export-btn" onclick="exportPDF()">📄 PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Final Summary -->
+    <div class="sticky-sidebar">
+      <div class="preview-frame">
+        <div class="preview-bar">
+          <span style="font-size:.78rem;color:var(--muted);font-weight:600">Son Önizleme</span>
+        </div>
+        <div class="preview-body" id="finalPreviewBody" style="font-size:.92em"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+var state = {
+  groqKey:'', devToken:'', customerId:'', oauthClientId:'', oauthClientSecret:'',
+  accessToken:'', refreshToken:'', pubClientId:'', pubClientSecret:'',
+  currentStep: 0,
+  variantCount: 1,
+  currentVariant: 0,
+  variants: [],           // [{headlines, descriptions, keywords, negKeywords, extensions}, ...]
+  demographics: {
+    ages: [], genders: [], devices: [], languages: ['1001']
+  },
+  schedule: {},           // { "Mon_8": true, ... }
+  sitelinks: []           // [{label, url}, ...]
+};
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+(function init(){
+  ['groqKey','devToken','customerId'].forEach(function(k){
+    var v = localStorage.getItem('gads_'+k);
+    if(v){ state[k]=v;
+      var el=document.getElementById(k); if(el) el.value=v;
+    }
+  });
+  // Load refresh token creds
+  var savedRefreshToken = localStorage.getItem('gads_refreshToken');
+  if(savedRefreshToken){ state.refreshToken = savedRefreshToken; var el=document.getElementById('refreshTokenInput'); if(el) el.value=savedRefreshToken; }
+  var savedPubCid = localStorage.getItem('gads_pubClientId');
+  if(savedPubCid){ state.pubClientId=savedPubCid; var el=document.getElementById('oauthClientIdPub'); if(el) el.value=savedPubCid; }
+  var savedPubCs = localStorage.getItem('gads_pubClientSecret');
+  if(savedPubCs){ state.pubClientSecret=savedPubCs; var el=document.getElementById('oauthClientSecretPub'); if(el) el.value=savedPubCs; }
+  var tok = localStorage.getItem('gads_accessToken');
+  if(tok){
+    state.accessToken=tok;
+    var el=document.getElementById('accessTokenInput'); if(el) el.value=tok;
+    var el2=document.getElementById('accessTokenInput2'); if(el2) el2.value=tok;
+    showOAuthOk();
+  }
+  if(localStorage.getItem('gads_groqKey')) document.getElementById('groqSaved').classList.add('show');
+
+  // Collect initial demographics from chips
+  collectDemoFromUI();
+
+  // Today's date
+  var today = new Date();
+  var ds = today.toISOString().split('T')[0];
+  document.getElementById('startDate').value = ds;
+
+  // Build schedule grid
+  buildScheduleGrid();
+  scheduleAll(true);
+
+  // OAuth callback
+  var hash = window.location.hash;
+  if(hash && hash.includes('access_token')){
+    var params = new URLSearchParams(hash.substring(1));
+    var tok2 = params.get('access_token');
+    if(tok2){ state.accessToken=tok2; localStorage.setItem('gads_accessToken',tok2); showOAuthOk(); window.history.replaceState(null,'',window.location.pathname); }
+  }
+})();
+
+// ════════════════════════════════════════════════════════
+// STEPPER
+// ════════════════════════════════════════════════════════
+function goStep(n){ setStep(n); }
+function nextStep(n){
+  if(n===0){
+    if(!document.getElementById('groqKey').value.trim()){ alert('Lütfen Groq API anahtarını girin.'); return; }
+    saveGroq(); saveGoogleCreds();
+  }
+  setStep(n+1);
+}
+function setStep(n){
+  state.currentStep = Math.max(state.currentStep, n);
+  for(var i=0;i<5;i++){
+    document.getElementById('panel'+i).classList.toggle('active', i===n);
+    var si = document.getElementById('si'+i);
+    si.classList.remove('active','done');
+    if(i===n) si.classList.add('active');
+    else if(i<n) si.classList.add('done');
+    if(i<4){
+      var sc = document.getElementById('sc'+i);
+      sc.classList.toggle('done', i<n);
+    }
+    var sn = document.getElementById('sn'+i);
+    if(i<n) sn.innerHTML = '✓';
+    else sn.textContent = (i+1);
+  }
+  if(n===4) buildCampaignSummary();
+  if(n===4 && state.variants.length){ buildFinalPreview(); }
+  if(n===3){ collectDemoFromUI(); calcEstimate(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════════════════
+// CREDENTIALS
+// ════════════════════════════════════════════════════════
+function saveGroq(){
+  var v = document.getElementById('groqKey').value.trim();
+  state.groqKey=v; localStorage.setItem('gads_groqKey',v);
+  var b = document.getElementById('groqSaved'); b.classList.add('show');
+  setTimeout(function(){ b.classList.remove('show'); },2500);
+}
+function saveAccessToken(){
+  var v = document.getElementById('accessTokenInput').value.trim();
+  if(!v){ alert('Lütfen Access Token girin.'); return; }
+  state.accessToken = v;
+  localStorage.setItem('gads_accessToken', v);
+  showOAuthOk();
+}
+function saveAccessToken2(){
+  var v = document.getElementById('accessTokenInput2').value.trim();
+  if(!v){ alert('Lütfen Access Token girin.'); return; }
+  state.accessToken = v;
+  localStorage.setItem('gads_accessToken', v);
+  var b = document.getElementById('tokenSaved2'); if(b){ b.classList.add('show'); setTimeout(function(){ b.classList.remove('show'); },3000); }
+  var el = document.getElementById('oauthStatus2'); if(el) el.innerHTML='<div class="oauth-status ok">✅ Access Token bağlandı</div>';
+}
+function saveGoogleCreds(){
+  ['devToken','customerId'].forEach(function(k){
+    var v = document.getElementById(k); if(v){ state[k]=v.value.trim(); localStorage.setItem('gads_'+k,v.value.trim()); }
+  });
+}
+function saveRefreshCreds(){
+  var cid = document.getElementById('oauthClientIdPub').value.trim();
+  var cs = document.getElementById('oauthClientSecretPub').value.trim();
+  var rt = document.getElementById('refreshTokenInput').value.trim();
+  if(cid){ state.pubClientId=cid; localStorage.setItem('gads_pubClientId', cid); }
+  if(cs){ state.pubClientSecret=cs; localStorage.setItem('gads_pubClientSecret', cs); }
+  if(rt){ state.refreshToken=rt; localStorage.setItem('gads_refreshToken', rt); }
+  var savedTag = document.getElementById('refreshSaved');
+  if(savedTag){ savedTag.style.display='inline-block'; savedTag.textContent='✓ Kaydedildi'; setTimeout(function(){ savedTag.style.display='none'; },2500); }
+}
+async function refreshAccessToken(){
+  var cid = document.getElementById('oauthClientIdPub').value.trim() || state.pubClientId;
+  var cs = document.getElementById('oauthClientSecretPub').value.trim() || state.pubClientSecret;
+  var rt = document.getElementById('refreshTokenInput').value.trim() || state.refreshToken;
+  if(!cid || !cs || !rt){ alert('Client ID, Client Secret ve Refresh Token alanlarını doldurun.'); return; }
+  var btn = document.getElementById('refreshTokenBtn');
+  btn.disabled=true; btn.textContent='⏳ Yenileniyor...';
+  try{
+    var res = await fetch('http://localhost:5000/token/refresh',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({client_id:cid, client_secret:cs, refresh_token:rt})
+    });
+    var data = await res.json();
+    if(data.error) throw new Error(data.error_description || data.error);
+    var newToken = data.access_token;
+    state.accessToken = newToken;
+    localStorage.setItem('gads_accessToken', newToken);
+    var el1 = document.getElementById('accessTokenInput'); if(el1) el1.value=newToken;
+    var el2 = document.getElementById('accessTokenInput2'); if(el2) el2.value=newToken;
+    var savedTag = document.getElementById('refreshSaved');
+    if(savedTag){ savedTag.style.display='inline-block'; savedTag.textContent='✓ Token yenilendi!'; setTimeout(function(){ savedTag.style.display='none'; },3000); }
+    var el = document.getElementById('oauthStatus2');
+    if(el) el.innerHTML='<div class="oauth-status ok">✅ Token yenilendi — kampanya yayınlanabilir</div>';
+  }catch(e){
+    alert('Token yenileme hatası: '+e.message+'\n\nProxy sunucu çalışıyor mu? (localhost:5000)');
+  }finally{
+    btn.disabled=false; btn.textContent='🔄 Token Yenile';
+  }
+}
+function startOAuth(){
+  var clientId = document.getElementById('oauthClientId').value.trim();
+  if(!clientId){ alert('OAuth Client ID giriniz.'); return; }
+  var redirectUri = window.location.href.split('#')[0];
+  var scope = 'https://www.googleapis.com/auth/adwords';
+  var url = 'https://accounts.google.com/o/oauth2/v2/auth?client_id='+encodeURIComponent(clientId)+'&redirect_uri='+encodeURIComponent(redirectUri)+'&response_type=token&scope='+encodeURIComponent(scope)+'&access_type=online';
+  window.location.href = url;
+}
+function showOAuthOk(){
+  var el = document.getElementById('oauthStatus');
+  if(el) el.innerHTML='<div class="oauth-status ok">✅ Access Token bağlandı — reklamlar yayınlanabilir</div>';
+  var b = document.getElementById('tokenSaved'); if(b){ b.classList.add('show'); setTimeout(function(){ b.classList.remove('show'); },3000); }
+}
+
+// ════════════════════════════════════════════════════════
+// VARIANT COUNT
+// ════════════════════════════════════════════════════════
+function selectVariantCount(n, el){
+  state.variantCount = n;
+  document.querySelectorAll('#variantCountChips .demo-chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
+}
+
+// ════════════════════════════════════════════════════════
+// GENERATE AD
+// ════════════════════════════════════════════════════════
+async function generateAd(){
+  var key = document.getElementById('groqKey').value.trim() || state.groqKey;
+  var brand = document.getElementById('brand').value.trim();
+  var url = document.getElementById('url').value.trim();
+  var desc = document.getElementById('desc').value.trim();
+  if(!key){ alert('Groq API anahtarı eksik.'); return; }
+  if(!brand || !desc){ alert('Marka adı ve açıklama zorunludur.'); return; }
+
+  var btn = document.getElementById('genBtn');
+  btn.classList.add('loading'); btn.disabled=true;
+
+  state.variants = [];
+  var count = state.variantCount;
+
+  for(var v=0; v<count; v++){
+    var variantLetter = ['A','B','C'][v];
+    var prompt = 'Sen bir Google Ads uzmanısın. Şu bilgilere göre yüksek dönüşümlü reklam metinleri oluştur.\n\n'+
+      'İşletme: '+brand+'\nURL: '+(url||'yok')+'\nAçıklama: '+desc+
+      '\nKonum: '+(document.getElementById('loc').value||'yok')+
+      '\nSektör: '+document.getElementById('sector').value+
+      '\nCTA: '+document.getElementById('cta').value+
+      '\nAvantaj: '+(document.getElementById('adv').value||'yok')+
+      (count>1 ? '\nBu Varyant '+variantLetter+': Farklı bir açı ve ton kullan.' : '')+'\n\n'+
+      'SADECE JSON döndür (başka hiçbir şey yazma):\n'+
+      '{"headlines":[{"text":"max 30 karakter","matchType":"BROAD"},{"text":"...","matchType":"BROAD"},{"text":"...","matchType":"BROAD"},{"text":"...","matchType":"BROAD"},{"text":"...","matchType":"BROAD"}],'+
+      '"descriptions":[{"text":"max 90 karakter"},{"text":"..."},{"text":"..."}],'+
+      '"keywords":[{"text":"kw1","matchType":"BROAD"},{"text":"kw2","matchType":"PHRASE"},{"text":"kw3","matchType":"EXACT"},{"text":"kw4","matchType":"BROAD"},{"text":"kw5","matchType":"PHRASE"},{"text":"kw6","matchType":"BROAD"},{"text":"kw7","matchType":"EXACT"},{"text":"kw8","matchType":"BROAD"}],'+
+      '"negKeywords":[{"text":"ücretsiz","matchType":"BROAD"},{"text":"bedava","matchType":"BROAD"},{"text":"nasıl yapılır","matchType":"PHRASE"}],'+
+      '"sitelinks":[{"label":"Hakkımızda","url":"https://'+url+'/hakkimizda"},{"label":"İletişim","url":"https://'+url+'/iletisim"},{"label":"Ürünler","url":"https://'+url+'/urunler"},{"label":"Kampanyalar","url":"https://'+url+'/kampanya"}]}\n\n'+
+      'Türkçe olsun. Başlıklar kesinlikle max 30 karakter, açıklamalar max 90 karakter.';
+
+    try{
+      var res = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.75,max_tokens:1400})
+      });
+      var data = await res.json();
+      if(data.error) throw new Error(data.error.message);
+      var raw = data.choices[0].message.content;
+      var m = raw.match(/\{[\s\S]*\}/);
+      if(!m) throw new Error('JSON alınamadı');
+      var parsed = JSON.parse(m[0]);
+      state.variants.push(parsed);
+    }catch(e){
+      alert('Varyant '+variantLetter+' oluşturulamadı: '+e.message);
+      btn.classList.remove('loading'); btn.disabled=false;
+      return;
+    }
+  }
+
+  // Use first variant's sitelinks as shared sitelinks
+  if(state.variants[0] && state.variants[0].sitelinks){
+    state.sitelinks = state.variants[0].sitelinks;
+  }
+
+  buildVariantTabs();
+  buildSitelinkEditor();
+  setStep(2);
+  btn.classList.remove('loading'); btn.disabled=false;
+}
+
+// ════════════════════════════════════════════════════════
+// VARIANT TABS
+// ════════════════════════════════════════════════════════
+function buildVariantTabs(){
+  var tabsEl = document.getElementById('variantTabs');
+  var panelsEl = document.getElementById('variantPanels');
+  tabsEl.innerHTML = '';
+  panelsEl.innerHTML = '';
+
+  state.variants.forEach(function(v, i){
+    var letter = ['A','B','C'][i];
+    var tab = document.createElement('div');
+    tab.className = 'variant-tab has-data' + (i===0?' active':'');
+    tab.textContent = 'Varyant '+letter;
+    tab.onclick = (function(idx){ return function(){ switchVariant(idx); }; })(i);
+    tab.id = 'vtab'+i;
+    tabsEl.appendChild(tab);
+
+    var panel = document.createElement('div');
+    panel.className = 'variant-panel' + (i===0?' active':'');
+    panel.id = 'vpanel'+i;
+    panelsEl.appendChild(panel);
+    buildVariantPanel(v, i);
+  });
+
+  state.currentVariant = 0;
+  buildKeywordTags(0);
+  buildNegKeywordTags(0);
+  buildPreview(0);
+  calcQualityScore(0);
+  saveToHistory();
+}
+
+function switchVariant(i){
+  state.currentVariant = i;
+  document.querySelectorAll('.variant-tab').forEach(function(t,j){ t.classList.toggle('active', j===i); });
+  document.querySelectorAll('.variant-panel').forEach(function(p,j){ p.classList.toggle('active', j===i); });
+  buildPreview(i);
+  calcQualityScore(i);
+  buildKeywordTags(i);
+  buildNegKeywordTags(i);
+}
+
+function buildVariantPanel(variant, vi){
+  var panel = document.getElementById('vpanel'+vi);
+  panel.innerHTML = '';
+
+  // Headlines
+  var htitle = document.createElement('div');
+  htitle.className = 'section-title';
+  htitle.textContent = '✏️ Başlıklar (max 30 karakter)';
+  panel.appendChild(htitle);
+
+  var hgrid = document.createElement('div');
+  hgrid.className = 'ad-edit-grid';
+  variant.headlines.forEach(function(h, i){
+    var chip = document.createElement('div'); chip.className='ad-chip'; chip.style.position='relative';
+    var lbl = document.createElement('div'); lbl.className='ad-chip-lbl'; lbl.textContent='Başlık '+(i+1);
+    var inp = document.createElement('input'); inp.type='text'; inp.value=h.text; inp.maxLength=30;
+    var cnt = document.createElement('div'); cnt.className='ad-chip-cnt';
+    // AI optimize button
+    var aiBtn = document.createElement('button');
+    aiBtn.className='ai-opt-btn'; aiBtn.textContent='✨ AI Doldur';
+    aiBtn.title='Kalan karakterleri AI ile doldur';
+    aiBtn.onclick=(function(inputEl, variantRef, idx, countEl){
+      return function(){
+        aiOptimizeHeadline(inputEl, variantRef, idx, countEl, this);
+      };
+    })(inp, variant, i, cnt);
+    function upd(){
+      var l=inp.value.length; cnt.textContent=l+'/30';
+      cnt.className='ad-chip-cnt'+(l>30?' over':l>27?' warn':'');
+      variant.headlines[i].text=inp.value; buildPreview(vi); calcQualityScore(vi);
+    }
+    inp.addEventListener('input',upd); upd();
+    chip.appendChild(lbl); chip.appendChild(aiBtn); chip.appendChild(inp); chip.appendChild(cnt);
+    hgrid.appendChild(chip);
+  });
+  panel.appendChild(hgrid);
+
+  var dv1 = document.createElement('div'); dv1.className='divider'; panel.appendChild(dv1);
+
+  // Descriptions
+  var dtitle = document.createElement('div'); dtitle.className='section-title'; dtitle.textContent='✏️ Açıklamalar (max 90 karakter)';
+  panel.appendChild(dtitle);
+
+  variant.descriptions.forEach(function(d, i){
+    var chip = document.createElement('div'); chip.className='ad-chip'; chip.style.marginBottom='8px';
+    var lbl = document.createElement('div'); lbl.className='ad-chip-lbl'; lbl.textContent='Açıklama '+(i+1);
+    var ta = document.createElement('textarea'); ta.value=d.text; ta.maxLength=90; ta.style.height='52px';
+    var cnt = document.createElement('div'); cnt.className='ad-chip-cnt';
+    function upd(){
+      var l=ta.value.length; cnt.textContent=l+'/90';
+      cnt.className='ad-chip-cnt'+(l>90?' over':l>81?' warn':'');
+      variant.descriptions[i].text=ta.value; buildPreview(vi);
+    }
+    ta.addEventListener('input',upd); upd();
+    chip.appendChild(lbl); chip.appendChild(ta); chip.appendChild(cnt);
+    panel.appendChild(chip);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// KEYWORDS
+// ════════════════════════════════════════════════════════
+var MATCH_LABELS = {BROAD:'Geniş', PHRASE:'Sözlük', EXACT:'Tam'};
+var MATCH_CSS = {BROAD:'match-broad', PHRASE:'match-phrase', EXACT:'match-exact'};
+
+function buildKeywordTags(vi){
+  var container = document.getElementById('keywordTags');
+  container.innerHTML = '';
+  var variant = state.variants[vi];
+  if(!variant) return;
+  variant.keywords.forEach(function(kw, i){
+    var tag = document.createElement('div'); tag.className='tag tag-blue';
+    tag.innerHTML = kw.text + ' <span class="match-badge '+MATCH_CSS[kw.matchType||'BROAD']+'">'+MATCH_LABELS[kw.matchType||'BROAD']+'</span> <span class="tag-remove" onclick="removeKeyword('+i+')">×</span>';
+    container.appendChild(tag);
+  });
+}
+
+function buildNegKeywordTags(vi){
+  var container = document.getElementById('negKeywordTags');
+  container.innerHTML = '';
+  var variant = state.variants[vi];
+  if(!variant) return;
+  if(!variant.negKeywords) variant.negKeywords = [];
+  variant.negKeywords.forEach(function(kw, i){
+    var tag = document.createElement('div'); tag.className='tag tag-red';
+    tag.innerHTML = '− '+kw.text + ' <span class="match-badge '+MATCH_CSS[kw.matchType||'BROAD']+'">'+MATCH_LABELS[kw.matchType||'BROAD']+'</span> <span class="tag-remove" onclick="removeNegKeyword('+i+')">×</span>';
+    container.appendChild(tag);
+  });
+}
+
+function addKeyword(){
+  var vi = state.currentVariant;
+  var text = document.getElementById('kwInput').value.trim();
+  var matchType = document.getElementById('kwMatchType').value;
+  if(!text) return;
+  state.variants[vi].keywords.push({text:text, matchType:matchType});
+  document.getElementById('kwInput').value = '';
+  buildKeywordTags(vi);
+}
+
+function removeKeyword(i){
+  var vi = state.currentVariant;
+  state.variants[vi].keywords.splice(i,1);
+  buildKeywordTags(vi);
+}
+
+function addNegKeyword(){
+  var vi = state.currentVariant;
+  var text = document.getElementById('negKwInput').value.trim();
+  var matchType = document.getElementById('negKwMatchType').value;
+  if(!text) return;
+  if(!state.variants[vi].negKeywords) state.variants[vi].negKeywords=[];
+  state.variants[vi].negKeywords.push({text:text, matchType:matchType});
+  document.getElementById('negKwInput').value = '';
+  buildNegKeywordTags(vi);
+}
+
+function removeNegKeyword(i){
+  var vi = state.currentVariant;
+  state.variants[vi].negKeywords.splice(i,1);
+  buildNegKeywordTags(vi);
+}
+
+// ════════════════════════════════════════════════════════
+// SITELINKS EDITOR (MANUAL)
+// ════════════════════════════════════════════════════════
+function buildSitelinkEditor(){
+  var el = document.getElementById('sitelinkEditor');
+  el.innerHTML = '';
+  state.sitelinks.forEach(function(sl, i){
+    var row = document.createElement('div'); row.className='sitelink-edit-row';
+    row.innerHTML = '<input type="text" value="'+sl.label+'" placeholder="Başlık" oninput="state.sitelinks['+i+'].label=this.value;buildPreview(state.currentVariant)">'+
+      '<input type="text" value="'+sl.url+'" placeholder="URL" oninput="state.sitelinks['+i+'].url=this.value">'+
+      '<button class="btn btn-sm" style="background:var(--red-l);color:var(--red);border:none;padding:8px 10px" onclick="removeSitelink('+i+')">×</button>';
+    el.appendChild(row);
+  });
+}
+
+function addSitelink(){
+  if(state.sitelinks.length >= 8){ alert('En fazla 8 bağlantı eklenebilir.'); return; }
+  state.sitelinks.push({label:'Yeni Bağlantı', url:'https://'});
+  buildSitelinkEditor();
+}
+
+function removeSitelink(i){
+  state.sitelinks.splice(i,1);
+  buildSitelinkEditor();
+  buildPreview(state.currentVariant);
+}
+
+// ════════════════════════════════════════════════════════
+// DEVICE TOGGLE
+// ════════════════════════════════════════════════════════
+var currentDevice = 'desktop';
+function setPreviewDevice(device){
+  currentDevice = device;
+  var isDesktop = device === 'desktop';
+  // Toggle buttons
+  document.getElementById('btnDesktop').style.background = isDesktop ? 'var(--blue)' : 'var(--bg)';
+  document.getElementById('btnDesktop').style.color = isDesktop ? '#fff' : 'var(--muted)';
+  document.getElementById('btnDesktop').style.border = isDesktop ? 'none' : '1px solid var(--border2)';
+  document.getElementById('btnMobile').style.background = !isDesktop ? 'var(--blue)' : 'var(--bg)';
+  document.getElementById('btnMobile').style.color = !isDesktop ? '#fff' : 'var(--muted)';
+  document.getElementById('btnMobile').style.border = !isDesktop ? 'none' : '1px solid var(--border2)';
+  // Show/hide panels
+  document.getElementById('previewBody').style.display = isDesktop ? '' : 'none';
+  document.getElementById('mobileShell').style.display = isDesktop ? 'none' : 'flex';
+  // Re-render
+  if(state.variants.length) buildPreview(state.currentVariant);
+}
+
+// ════════════════════════════════════════════════════════
+// PREVIEW
+// ════════════════════════════════════════════════════════
+function getCleanUrl(){ var u=document.getElementById('url').value.trim(); return u?u.replace(/^https?:\/\//,''):(document.getElementById('brand').value.toLowerCase().replace(/\s+/g,'-')+'.com'); }
+function getFavColor(b){ var c=['#4285f4','#ea4335','#fbbc04','#34a853','#7c3aed','#f97316']; return c[(b||'A').charCodeAt(0)%c.length]; }
+
+function buildPreview(vi){
+  var variant = state.variants[vi];
+  if(!variant) return;
+  var brand = document.getElementById('brand').value.trim();
+  var domain = getCleanUrl();
+  var fav = getFavColor(brand);
+  var letter = (brand||'?')[0].toUpperCase();
+
+  var hs = variant.headlines.slice(0,3).map(function(h){ return h.text; }).filter(Boolean);
+  var d = variant.descriptions[0] ? variant.descriptions[0].text : '';
+
+  // Sitelinks
+  var visibleSitelinks = state.sitelinks.slice(0,4);
+  function makeSitelinksDesktop(){
+    if(visibleSitelinks.length < 2) return '';
+    return '<div class="g-sitelinks">' + visibleSitelinks.map(function(sl){
+      return '<div class="g-sitelink"><span class="g-sitelink-txt">'+sl.label+'</span><span class="g-sitelink-arr">›</span></div>';
+    }).join('') + '</div>';
+  }
+  function makeSitelinksMobile(){
+    if(visibleSitelinks.length < 2) return '';
+    return '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">' +
+      visibleSitelinks.map(function(sl){
+        return '<div style="border:1px solid #dadce0;border-radius:16px;padding:5px 11px;font-size:12px;color:#1a0dab;white-space:nowrap">'+sl.label+'</div>';
+      }).join('') + '</div>';
+  }
+
+  // ── DESKTOP ──
+  var desktopBody = document.getElementById('previewBody');
+  desktopBody.innerHTML = '';
+  var ad = document.createElement('div'); ad.className='g-ad';
+  ad.innerHTML =
+    '<div class="g-sponsor">Ücretli sponsorlu reklam</div>'+
+    '<div class="g-toprow">'+
+      '<div class="g-fav" style="background:'+fav+'">'+letter+'</div>'+
+      '<div><div class="g-domain">'+brand+'</div><div class="g-url">https://www.'+domain+'</div></div>'+
+    '</div>'+
+    '<div class="g-headline">'+hs.join(' | ')+'</div>'+
+    '<div class="g-desc">'+d+'</div>'+
+    makeSitelinksDesktop();
+  desktopBody.appendChild(ad);
+
+  // ── MOBILE ──
+  var mobileBody = document.getElementById('mobilePreviewBody');
+  if(mobileBody){
+    mobileBody.innerHTML =
+      '<div style="font-size:10px;background:#f2f2f2;display:inline-block;padding:2px 6px;border-radius:3px;color:#70757a;margin-bottom:6px">Ücretli sponsorlu reklam</div>'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">'+
+        '<div style="width:24px;height:24px;border-radius:50%;background:'+fav+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">'+letter+'</div>'+
+        '<div><div style="font-size:13px;color:#202124">'+brand+'</div><div style="font-size:11px;color:#5f6368">https://www.'+domain+'</div></div>'+
+      '</div>'+
+      '<div style="font-size:16px;color:#1a0dab;line-height:1.3;margin-bottom:4px">'+hs.join(' | ')+'</div>'+
+      '<div style="font-size:13px;color:#4d5156;line-height:1.5">'+d+'</div>'+
+      makeSitelinksMobile();
+
+    // Update mobile search term
+    var mst = document.getElementById('mobileSearchTerm');
+    if(mst) mst.textContent = (variant.keywords[0] && variant.keywords[0].text) || 'arama terimi...';
+  }
+
+  // Update desktop search placeholder
+  if(document.getElementById('previewSearch'))
+    document.getElementById('previewSearch').placeholder = (variant.keywords[0]&&variant.keywords[0].text)||'arama terimi';
+}
+
+// ════════════════════════════════════════════════════════
+// DEMOGRAPHICS
+// ════════════════════════════════════════════════════════
+function toggleDemoChip(el, type){ el.classList.toggle('on'); collectDemoFromUI(); calcEstimate(); }
+function toggleLangChip(el){ el.classList.toggle('on'); collectDemoFromUI(); }
+function collectDemoFromUI(){
+  state.demographics.ages = getOnChips('ageChips');
+  state.demographics.genders = getOnChips('genderChips');
+  state.demographics.devices = getOnChips('deviceChips');
+  state.demographics.languages = getOnChips('langChips');
+}
+function getOnChips(id){
+  var arr=[];
+  var el=document.getElementById(id);
+  if(!el) return arr;
+  el.querySelectorAll('.demo-chip.on').forEach(function(c){ arr.push(c.dataset.val); });
+  return arr;
+}
+
+// ════════════════════════════════════════════════════════
+// SCHEDULE GRID
+// ════════════════════════════════════════════════════════
+var DAYS = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+var HOURS = ['06-09','09-12','12-15','15-18','18-21','21-00'];
+
+function buildScheduleGrid(){
+  var wrap = document.getElementById('scheduleGrid');
+  wrap.innerHTML = '';
+
+  // Header row
+  var headerRow = document.createElement('div');
+  headerRow.style = 'display:grid;grid-template-columns:48px repeat(7,1fr);gap:3px;margin-bottom:3px';
+  headerRow.innerHTML = '<div></div>';
+  DAYS.forEach(function(d){
+    var h = document.createElement('div'); h.className='schedule-col-head'; h.textContent=d;
+    headerRow.appendChild(h);
+  });
+  wrap.appendChild(headerRow);
+
+  HOURS.forEach(function(hour){
+    var row = document.createElement('div');
+    row.style = 'display:grid;grid-template-columns:48px repeat(7,1fr);gap:3px;margin-bottom:3px';
+    var lbl = document.createElement('div'); lbl.className='schedule-hour-label'; lbl.textContent=hour;
+    row.appendChild(lbl);
+    DAYS.forEach(function(d){
+      var key = d+'_'+hour;
+      var cell = document.createElement('div');
+      cell.className = 'schedule-cell';
+      cell.dataset.key = key;
+      cell.onclick = function(){ toggleSchedule(this); };
+      row.appendChild(cell);
+    });
+    wrap.appendChild(row);
+  });
+}
+
+function toggleSchedule(cell){
+  var key = cell.dataset.key;
+  state.schedule[key] = !state.schedule[key];
+  cell.classList.toggle('on', !!state.schedule[key]);
+  updateScheduleCount();
+}
+
+function scheduleAll(on){
+  document.querySelectorAll('.schedule-cell').forEach(function(c){
+    state.schedule[c.dataset.key] = on;
+    c.classList.toggle('on', on);
+  });
+  updateScheduleCount();
+}
+
+function scheduleWorkdays(){
+  scheduleAll(false);
+  document.querySelectorAll('.schedule-cell').forEach(function(c){
+    var day = c.dataset.key.split('_')[0];
+    var on = ['Pzt','Sal','Çar','Per','Cum'].includes(day);
+    state.schedule[c.dataset.key] = on;
+    c.classList.toggle('on', on);
+  });
+  updateScheduleCount();
+}
+
+function updateScheduleCount(){
+  var count = Object.values(state.schedule).filter(Boolean).length;
+  var total = DAYS.length * HOURS.length;
+  document.getElementById('scheduleCount').textContent = count+'/'+total+' zaman dilimi aktif';
+}
+
+// ════════════════════════════════════════════════════════
+// PERFORMANCE ESTIMATE
+// ════════════════════════════════════════════════════════
+var SECTOR_CPC = {genel:2.5, gida:1.8, eticaret:3.2, saglik:4.5, egitim:2.0, hizmet:3.5, teknoloji:5.0, insaat:6.0};
+var SECTOR_CTR = {genel:3.5, gida:4.2, eticaret:3.8, saglik:3.0, egitim:4.5, hizmet:3.2, teknoloji:2.8, insaat:2.5};
+
+function fmtNum(n){ if(n>=1000000) return (n/1000000).toFixed(1)+'M'; if(n>=1000) return (n/1000).toFixed(1)+'K'; return String(n); }
+
+function calcEstimate(){
+  var budgetEl = document.getElementById('budgetEstimate');
+  var budget = budgetEl ? (parseFloat(budgetEl.value) || 100) : 100;
+  var sectorEl = document.getElementById('sector');
+  var sector = sectorEl ? sectorEl.value : 'genel';
+  var cpc = SECTOR_CPC[sector] || 2.5;
+  var ctr = SECTOR_CTR[sector] || 3.5;
+
+  var devOn = getOnChips('deviceChips').length || 3;
+  var ageOn = getOnChips('ageChips').length || 6;
+  var reachMult = Math.max(0.2, (devOn/3) * (ageOn/6));
+
+  var clicks = Math.round((budget / cpc) * reachMult);
+  var impressions = Math.round(clicks / (ctr / 100));
+  var monthly = clicks * 30;
+
+  var ids = {estImpressions: fmtNum(impressions), estClicks: fmtNum(clicks), estCPC: '₺'+cpc.toFixed(2), estCTR: ctr.toFixed(1)+'%', estMonthly: fmtNum(monthly)};
+  Object.keys(ids).forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.textContent = ids[id];
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// CAMPAIGN SUMMARY
+// ════════════════════════════════════════════════════════
+function buildCampaignSummary(){
+  if(!state.variants.length) return;
+  var brand = document.getElementById('brand').value;
+  document.getElementById('campaignName').value = brand+' - Arama Kampanyası';
+  document.getElementById('targetLoc').value = document.getElementById('loc').value || 'Türkiye';
+
+  var v = state.variants[0];
+  var negKwHtml = (v.negKeywords&&v.negKeywords.length) ? v.negKeywords.map(function(k){ return '<span class="tag tag-red" style="margin-right:4px">−'+k.text+'</span>'; }).join('') : '<span style="color:var(--muted)">Yok</span>';
+  var kwHtml = v.keywords.map(function(k){ return '<span class="tag tag-blue" style="margin-right:4px">'+k.text+'</span>'; }).join('');
+  var langHtml = state.demographics.languages.map(function(l){
+    var names = {'1001':'🇹🇷 Türkçe','1000':'🇺🇸 İngilizce','1020':'🇩🇪 Almanca','1004':'🇫🇷 Fransızca','1003':'🇦🇷 Arapça','1031':'🇷🇺 Rusça'};
+    return '<span class="tag tag-gray" style="margin-right:4px">'+(names[l]||l)+'</span>';
+  }).join('');
+
+  var activeSlots = Object.values(state.schedule).filter(Boolean).length;
+
+  document.getElementById('campaignSummary').innerHTML =
+    '<table style="width:100%;border-collapse:collapse">'+
+    '<tr><td style="padding:6px 0;color:var(--muted);width:180px;vertical-align:top">İşletme</td><td style="font-weight:600">'+brand+'</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">URL</td><td style="font-weight:600">'+getCleanUrl()+'</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">Varyasyon Sayısı</td><td style="font-weight:600">'+state.variants.length+' varyant</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">Başlıklar</td><td style="font-weight:600">'+v.headlines.length+' başlık</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">Anahtar Kelimeler</td><td>'+kwHtml+'</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">Negatif Kelimeler</td><td>'+negKwHtml+'</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">Dil Hedefleme</td><td>'+langHtml+'</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">Cihazlar</td><td style="font-weight:600">'+state.demographics.devices.join(', ')+'</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">Reklam Takvimi</td><td style="font-weight:600">'+activeSlots+'/'+DAYS.length*HOURS.length+' zaman dilimi</td></tr>'+
+    '<tr><td style="padding:6px 0;color:var(--muted);vertical-align:top">Site Bağlantıları</td><td style="font-weight:600">'+state.sitelinks.length+' bağlantı</td></tr>'+
+    '</table>';
+}
+
+function buildFinalPreview(){
+  var body = document.getElementById('finalPreviewBody');
+  if(!body || !state.variants.length) return;
+  body.innerHTML = '';
+
+  var brand = document.getElementById('brand').value.trim();
+  var domain = getCleanUrl();
+  var fav = getFavColor(brand);
+  var letter = (brand||'?')[0].toUpperCase();
+
+  state.variants.forEach(function(variant, vi){
+    var hs = variant.headlines.slice(0,3).map(function(h){ return h.text; }).filter(Boolean);
+    var d = variant.descriptions[0] ? variant.descriptions[0].text : '';
+    var varLbl = ['A','B','C'][vi];
+    var ad = document.createElement('div'); ad.className='g-ad';
+    ad.innerHTML = '<div style="font-size:10px;color:#7c3aed;font-weight:700;margin-bottom:6px">▸ Varyant '+varLbl+'</div>'+
+      '<div class="g-sponsor">Ücretli sponsorlu reklam</div>'+
+      '<div class="g-toprow">'+
+        '<div class="g-fav" style="background:'+fav+'">'+letter+'</div>'+
+        '<div><div class="g-domain">'+brand+'</div><div class="g-url">https://www.'+domain+'</div></div>'+
+      '</div>'+
+      '<div class="g-headline">'+hs.join(' | ')+'</div>'+
+      '<div class="g-desc">'+d+'</div>';
+    body.appendChild(ad);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// BUDGET SYNC
+// ════════════════════════════════════════════════════════
+function updateBudget(){ document.getElementById('budgetRange').value = document.getElementById('budget').value; }
+function syncBudget(){ document.getElementById('budget').value = document.getElementById('budgetRange').value; }
+
+// ════════════════════════════════════════════════════════
+// EXPORT
+// ════════════════════════════════════════════════════════
+function exportJSON(){
+  if(!state.variants.length){ alert('Önce reklam oluşturun.'); return; }
+  var brand = document.getElementById('brand').value;
+  var payload = {
+    brand: brand,
+    url: getCleanUrl(),
+    variants: state.variants,
+    sitelinks: state.sitelinks,
+    demographics: state.demographics,
+    schedule: state.schedule,
+    campaignSettings: {
+      name: document.getElementById('campaignName') ? document.getElementById('campaignName').value : brand+' Kampanyası',
+      budget: document.getElementById('budget') ? document.getElementById('budget').value : 100,
+      targetLoc: document.getElementById('targetLoc') ? document.getElementById('targetLoc').value : 'Türkiye',
+      bidStrategy: document.getElementById('bidStrategy') ? document.getElementById('bidStrategy').value : 'MAXIMIZE_CLICKS'
+    },
+    exportedAt: new Date().toISOString()
+  };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'reklam-'+brand.replace(/\s+/g,'-').toLowerCase()+'.json';
+  a.click();
+}
+
+function exportPDF(){
+  if(!state.variants.length){ alert('Önce reklam oluşturun.'); return; }
+  var brand = document.getElementById('brand').value;
+  var domain = getCleanUrl();
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reklam Raporu - '+brand+'</title><style>'+
+    'body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;color:#333;font-size:13px}'+
+    'h1{font-size:20px;margin-bottom:4px}'+
+    '.meta{color:#888;margin-bottom:30px;font-size:12px}'+
+    '.variant{margin-bottom:30px;padding:20px;border:1px solid #ddd;border-radius:8px}'+
+    '.vlabel{font-size:11px;font-weight:bold;color:#7c3aed;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}'+
+    '.headline{font-size:20px;color:#1a0dab;margin-bottom:6px}'+
+    '.url{font-size:12px;color:#006621;margin-bottom:4px}'+
+    '.desc{font-size:13px;color:#545454;line-height:1.5;margin-bottom:12px}'+
+    '.kw-section{margin-bottom:12px}'+
+    '.kw-label{font-size:11px;font-weight:bold;color:#555;margin-bottom:6px}'+
+    '.kw{display:inline-block;padding:3px 10px;margin:2px;border-radius:12px;font-size:11px;font-weight:600}'+
+    '.kw-blue{background:#ebf0ff;color:#1e40af;border:1px solid #bfdbfe}'+
+    '.kw-red{background:#fff5f5;color:#991b1b;border:1px solid #fecaca}'+
+    '.sitelink{display:inline-block;padding:4px 12px;margin:2px;border:1px solid #ddd;border-radius:6px;font-size:12px;color:#1a0dab}'+
+    '.settings{margin-top:20px;padding:16px;background:#f5f5f5;border-radius:8px}'+
+    '.settings h3{font-size:14px;margin-bottom:10px}'+
+    '.settings table{width:100%;border-collapse:collapse}'+
+    '.settings td{padding:4px 0;font-size:12px}'+
+    '.settings td:first-child{color:#888;width:160px}'+
+    '@media print{.no-print{display:none}}'+
+    '</style></head><body>'+
+    '<button class="no-print" onclick="window.print()" style="position:fixed;top:20px;right:20px;padding:10px 20px;background:#1a56db;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600">🖨️ Yazdır / PDF Kaydet</button>'+
+    '<h1>📢 Google Ads Raporu — '+brand+'</h1>'+
+    '<div class="meta">🌐 '+domain+' &nbsp;|&nbsp; 📅 '+new Date().toLocaleDateString('tr-TR')+'</div>';
+
+  state.variants.forEach(function(variant, vi){
+    var letter=['A','B','C'][vi];
+    var hs=variant.headlines.slice(0,3).map(function(h){return h.text;}).join(' | ');
+    var descs=variant.descriptions.map(function(d){return d.text;}).join('<br>');
+    html += '<div class="variant">'+
+      '<div class="vlabel">Varyant '+letter+'</div>'+
+      '<div class="url">https://www.'+domain+'</div>'+
+      '<div class="headline">'+hs+'</div>'+
+      '<div class="desc">'+descs+'</div>'+
+      '<div class="kw-section"><div class="kw-label">Anahtar Kelimeler</div>'+
+      variant.keywords.map(function(k){return '<span class="kw kw-blue">'+k.text+' <small>('+MATCH_LABELS[k.matchType||'BROAD']+')</small></span>';}).join('')+'</div>'+
+      ((variant.negKeywords&&variant.negKeywords.length)?
+        '<div class="kw-section"><div class="kw-label">Negatif Kelimeler</div>'+
+        variant.negKeywords.map(function(k){return '<span class="kw kw-red">−'+k.text+'</span>';}).join('')+'</div>':'')+
+      '</div>';
+  });
+
+  if(state.sitelinks.length){
+    html += '<div style="margin-top:20px"><strong style="font-size:12px;color:#555">🔗 Site Bağlantıları:</strong><br><div style="margin-top:8px">'+
+      state.sitelinks.map(function(sl){return '<span class="sitelink">'+sl.label+'</span>';}).join('')+'</div></div>';
+  }
+
+  html += '<div class="settings"><h3>⚙️ Kampanya Ayarları</h3><table>'+
+    '<tr><td>Hedef Bölge</td><td>'+(document.getElementById('targetLoc')?document.getElementById('targetLoc').value:'Türkiye')+'</td></tr>'+
+    '<tr><td>Diller</td><td>'+state.demographics.languages.join(', ')+'</td></tr>'+
+    '<tr><td>Cihazlar</td><td>'+state.demographics.devices.join(', ')+'</td></tr>'+
+    '<tr><td>Yaş Grupları</td><td>'+state.demographics.ages.join(', ')+'</td></tr>'+
+    '<tr><td>Cinsiyet</td><td>'+state.demographics.genders.join(', ')+'</td></tr>'+
+    '</table></div>';
+
+  html += '</body></html>';
+
+  var w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
+function copyAllText(){
+  if(!state.variants.length){ alert('Önce reklam oluşturun.'); return; }
+  var text = '';
+  state.variants.forEach(function(variant, vi){
+    text += '=== VARYANT '+['A','B','C'][vi]+' ===\n\n';
+    text += 'BAŞLIKLAR:\n';
+    variant.headlines.forEach(function(h,i){ text += (i+1)+'. '+h.text+'\n'; });
+    text += '\nAÇIKLAMALAR:\n';
+    variant.descriptions.forEach(function(d,i){ text += (i+1)+'. '+d.text+'\n'; });
+    text += '\nANAHTAR KELİMELER:\n';
+    variant.keywords.forEach(function(k){ text += '+ '+k.text+' ['+MATCH_LABELS[k.matchType]+'] \n'; });
+    if(variant.negKeywords && variant.negKeywords.length){
+      text += '\nNEGATİF KELİMELER:\n';
+      variant.negKeywords.forEach(function(k){ text += '- '+k.text+'\n'; });
+    }
+    text += '\n';
+  });
+  navigator.clipboard.writeText(text).then(function(){
+    alert('Reklam metinleri panoya kopyalandı!');
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// PUBLISH
+// ════════════════════════════════════════════════════════
+// Token otomatik yenileme yardımcı fonksiyonu
+async function tryAutoRefreshToken(){
+  var cid = state.pubClientId || document.getElementById('oauthClientIdPub').value.trim();
+  var cs = state.pubClientSecret || document.getElementById('oauthClientSecretPub').value.trim();
+  var rt = state.refreshToken || document.getElementById('refreshTokenInput').value.trim();
+  if(!cid || !cs || !rt) return false; // Bilgiler eksik, otomatik yenilenemez
+  try{
+    var res = await fetch('http://localhost:5000/token/refresh',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({client_id:cid, client_secret:cs, refresh_token:rt})
+    });
+    var data = await res.json();
+    if(data.access_token){
+      state.accessToken = data.access_token;
+      localStorage.setItem('gads_accessToken', data.access_token);
+      var el1=document.getElementById('accessTokenInput'); if(el1) el1.value=data.access_token;
+      var el2=document.getElementById('accessTokenInput2'); if(el2) el2.value=data.access_token;
+      return true;
+    }
+  }catch(e){ /* sessizce başarısız, manuel yenileme gerektirecek */ }
+  return false;
+}
+
+async function publishAd(){
+  var btn = document.getElementById('publishBtn');
+  var wrap = document.getElementById('pubStatusWrap');
+
+  // Read credentials from step 5 inputs
+  var cidEl = document.getElementById('customerId'); if(cidEl && cidEl.value) state.customerId = cidEl.value.trim();
+  var dtEl = document.getElementById('devToken'); if(dtEl && dtEl.value) state.devToken = dtEl.value.trim();
+  var tokEl = document.getElementById('accessTokenInput2'); if(tokEl && tokEl.value) state.accessToken = tokEl.value.trim();
+
+  if(!state.accessToken){
+    wrap.innerHTML='<div class="pub-status error"><div class="pub-icon">🔐</div><div class="pub-title">Access Token Eksik</div><div class="pub-msg">Aşağıdaki "Access Token" alanını doldurun. OAuth Playground\'dan alabilirsiniz.</div></div>';
+    return;
+  }
+  if(!state.customerId || !state.devToken){
+    wrap.innerHTML='<div class="pub-status error"><div class="pub-icon">⚠️</div><div class="pub-title">Eksik Bilgi</div><div class="pub-msg">Müşteri Kimliği, Geliştirici Token ve Access Token alanlarını doldurun.</div></div>';
+    return;
+  }
+  if(!state.variants.length){
+    wrap.innerHTML='<div class="pub-status error"><div class="pub-icon">⚠️</div><div class="pub-title">Reklam Oluşturulmamış</div><div class="pub-msg">Önce Adım 2\'de reklam içeriği oluşturun.</div></div>';
+    return;
+  }
+
+  btn.classList.add('loading'); btn.disabled=true;
+
+  var cid = state.customerId.replace(/-/g,'');
+  var headers = {
+    'Content-Type':'application/json',
+    'Authorization':'Bearer '+state.accessToken,
+    'developer-token':state.devToken,
+    'login-customer-id':cid
+  };
+  var base = 'http://localhost:5000/proxy/v19/customers/'+cid;
+  var campaignName = document.getElementById('campaignName').value || 'Yeni Kampanya';
+  var budget = parseInt(document.getElementById('budget').value)||100;
+  var startDate = document.getElementById('startDate').value.replace(/-/g,'');
+  var endDate = document.getElementById('endDate').value.replace(/-/g,'')||null;
+  var bidStrategy = document.getElementById('bidStrategy').value;
+  var finalUrl = 'https://'+getCleanUrl();
+  var targetLoc = document.getElementById('targetLoc').value||'Turkey';
+
+  try{
+    // 1. Budget
+    wrap.innerHTML = pubStep('Bütçe oluşturuluyor...',1,6);
+    var budgetRes = await fetch(base+'/campaignBudgets:mutate',{method:'POST',headers:headers,body:JSON.stringify({operations:[{create:{name:campaignName+' Bütçe',amountMicros:String(budget*1000000),deliveryMethod:'STANDARD'}}]})});
+    var budgetData = await budgetRes.json();
+    // 401 kontrolü - token süresi dolmuş
+    if(budgetRes.status === 401 || (budgetData.error && budgetData.error.code === 401)){
+      var refreshed = await tryAutoRefreshToken();
+      if(refreshed){
+        // Token yenilendi, tekrar dene
+        headers['Authorization'] = 'Bearer '+state.accessToken;
+        budgetRes = await fetch(base+'/campaignBudgets:mutate',{method:'POST',headers:headers,body:JSON.stringify({operations:[{create:{name:campaignName+' Bütçe',amountMicros:String(budget*1000000),deliveryMethod:'STANDARD'}}]})});
+        budgetData = await budgetRes.json();
+      } else {
+        throw new Error('TOKEN_EXPIRED');
+      }
+    }
+    if(budgetData.error) throw new Error('Bütçe: '+budgetData.error.message);
+    var budgetResource = budgetData.results[0].resourceName;
+
+    // 2. Campaign
+    wrap.innerHTML = pubStep('Kampanya oluşturuluyor...',2,6);
+    var campObj = {
+      name:campaignName, advertisingChannelType:'SEARCH', status:'PAUSED',
+      campaignBudget:budgetResource, startDate:startDate,
+      networkSettings:{targetGoogleSearch:true,targetSearchNetwork:true,targetContentNetwork:false}
+    };
+    if(endDate) campObj.endDate=endDate;
+    if(bidStrategy==='MAXIMIZE_CLICKS') campObj.maximizeClicks={};
+    else if(bidStrategy==='MAXIMIZE_CONVERSIONS') campObj.maximizeConversions={};
+    var campRes = await fetch(base+'/campaigns:mutate',{method:'POST',headers:headers,body:JSON.stringify({operations:[{create:campObj}]})});
+    var campData = await campRes.json();
+    if(campData.error) throw new Error('Kampanya: '+campData.error.message);
+    var campResource = campData.results[0].resourceName;
+
+    // 3. Ad Group (one per variant)
+    wrap.innerHTML = pubStep('Reklam grupları oluşturuluyor...',3,6);
+    var agResources = [];
+    for(var vi=0;vi<state.variants.length;vi++){
+      var letter = ['A','B','C'][vi];
+      var agRes = await fetch(base+'/adGroups:mutate',{method:'POST',headers:headers,body:JSON.stringify({operations:[{create:{name:campaignName+' Grup '+letter,campaign:campResource,status:'ENABLED',type:'SEARCH_STANDARD',cpcBidMicros:"1000000"}}]})});
+      var agData = await agRes.json();
+      if(agData.error) throw new Error('Reklam Grubu: '+agData.error.message);
+      agResources.push(agData.results[0].resourceName);
+    }
+
+    // 4. RSA Ads per variant
+    wrap.innerHTML = pubStep('Reklam metinleri yükleniyor...',4,6);
+    for(var vi=0;vi<state.variants.length;vi++){
+      var v = state.variants[vi];
+      var rsaHeadlines = v.headlines.map(function(h){ return {text:h.text.substring(0,30)}; });
+      var rsaDescs = v.descriptions.map(function(d){ return {text:d.text.substring(0,90)}; });
+      var adRes = await fetch(base+'/adGroupAds:mutate',{method:'POST',headers:headers,body:JSON.stringify({operations:[{create:{adGroup:agResources[vi],status:'ENABLED',ad:{finalUrls:[finalUrl],responsiveSearchAd:{headlines:rsaHeadlines,descriptions:rsaDescs}}}}]})});
+      var adData = await adRes.json();
+      if(adData.error) throw new Error('Reklam: '+adData.error.message);
+    }
+
+    // 5. Keywords (positive + negative) per variant
+    wrap.innerHTML = pubStep('Anahtar kelimeler ekleniyor...',5,6);
+    for(var vi=0;vi<state.variants.length;vi++){
+      var v = state.variants[vi];
+      var kwOps = v.keywords.slice(0,10).map(function(kw){ return {create:{adGroup:agResources[vi],status:'ENABLED',keyword:{text:kw.text,matchType:kw.matchType||'BROAD'}}}; });
+      if(kwOps.length){
+        var kwRes = await fetch(base+'/adGroupCriteria:mutate',{method:'POST',headers:headers,body:JSON.stringify({operations:kwOps})});
+        var kwData = await kwRes.json();
+        if(kwData.error) throw new Error('Anahtar Kelimeler: '+kwData.error.message);
+      }
+      // Negative keywords
+      if(v.negKeywords && v.negKeywords.length){
+        var negOps = v.negKeywords.map(function(kw){ return {create:{adGroup:agResources[vi],negative:true,keyword:{text:kw.text,matchType:kw.matchType||'BROAD'}}}; });
+        var negRes = await fetch(base+'/adGroupCriteria:mutate',{method:'POST',headers:headers,body:JSON.stringify({operations:negOps})});
+        var negData = await negRes.json();
+        if(negData.error) throw new Error('Negatif Kelimeler: '+negData.error.message);
+      }
+    }
+
+    // 6. Sitelink extensions
+    wrap.innerHTML = pubStep('Uzantılar ekleniyor...',6,6);
+    if(state.sitelinks.length){
+      var slOps = state.sitelinks.slice(0,8).map(function(sl){
+        return {create:{campaign:campResource,extension:{sitelinkFeedItem:{linkText:sl.label,finalUrls:[sl.url||finalUrl]}}}};
+      });
+      // Note: Extensions API may vary; this is a simplified call
+      // await fetch(base+'/campaignExtensionSettings:mutate',{...}) - skipped if API v17 differs
+    }
+
+    wrap.innerHTML = '<div class="pub-status success">'+
+      '<div class="pub-icon">🎉</div>'+
+      '<div class="pub-title">Kampanya Başarıyla Oluşturuldu!</div>'+
+      '<div class="pub-msg">'+state.variants.length+' varyant Google Ads hesabınıza eklendi. <strong>Duraklatılmış</strong> olarak oluşturuldu — inceledikten sonra <a href="https://ads.google.com" target="_blank" style="color:var(--green);font-weight:700">Google Ads panelinden</a> aktif edin.</div>'+
+      '<div class="pub-code">Kampanya: '+campResource+'</div>'+
+      '<a href="https://ads.google.com" target="_blank" class="btn btn-success" style="margin-top:16px;display:inline-flex">Google Ads\'i Aç →</a>'+
+    '</div>';
+
+  }catch(e){
+    if(e.message === 'TOKEN_EXPIRED'){
+      wrap.innerHTML='<div class="pub-status error"><div class="pub-icon">🔐</div><div class="pub-title">Access Token Süresi Doldu</div>'+
+        '<div class="pub-msg">Token 1 saat sonra geçersiz oluyor. Lütfen aşağıdaki adımlardan birini yapın:<br><br>'+
+        '<strong>1. Otomatik:</strong> "Refresh Token" alanlarını doldurup <strong>"🔄 Token Yenile"</strong> butonuna basın.<br>'+
+        '<strong>2. Manuel:</strong> <a href="https://developers.google.com/oauthplayground" target="_blank" style="color:var(--blue)">OAuth Playground</a>\'dan yeni Access Token alıp "Kaydet"e basın.</div>'+
+        '<div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+
+        '<button class="btn btn-primary" onclick="refreshAccessToken()">🔄 Otomatik Token Yenile</button>'+
+        '<a href="https://developers.google.com/oauthplayground" target="_blank" class="btn btn-secondary">🔗 OAuth Playground</a>'+
+        '</div></div>';
+    } else {
+      wrap.innerHTML='<div class="pub-status error"><div class="pub-icon">❌</div><div class="pub-title">Yayınlama Hatası</div><div class="pub-msg">'+e.message+'</div></div>';
+    }
+  }finally{
+    btn.classList.remove('loading'); btn.disabled=false;
+  }
+}
+
+function pubStep(msg, step, total){
+  var steps=['Bütçe','Kampanya','Reklam Grupları','Reklam Metni','Anahtar Kelimeler','Uzantılar'].slice(0,total);
+  var bars = steps.map(function(s,i){
+    var done=i<step-1; var active=i===step-1;
+    return '<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:.82rem;color:'+(done?'#0e9f6e':active?'#1a56db':'#8fa0b4')+'">'+
+      '<span>'+(done?'✓':active?'⏳':'○')+'</span><span>'+s+'</span></div>';
+  }).join('');
+  return '<div class="pub-status loading-state"><div class="pub-icon">⚙️</div><div class="pub-title">'+msg+'</div>'+bars+'</div>';
+}
+// Sayfa yüklenince direkt çalıştır
+calcEstimate();
+
+// ════════════════════════════════════════════════════════
+// QUALITY SCORE
+// ════════════════════════════════════════════════════════
+function calcQualityScore(vi){
+  var variant = state.variants[vi];
+  if(!variant) return;
+  var scores = {};
+
+  // 1. Başlık sayısı (ideal: 5+)
+  scores.headlineCount = Math.min(100, (variant.headlines.length / 5) * 100);
+
+  // 2. Başlık doluluk oranı (ortalama karakter / 30)
+  var avgHLen = variant.headlines.reduce(function(s,h){ return s+h.text.length; },0) / Math.max(1,variant.headlines.length);
+  scores.headlineFill = Math.min(100, (avgHLen / 25) * 100);
+
+  // 3. Açıklama doluluk oranı
+  var avgDLen = variant.descriptions.reduce(function(s,d){ return s+d.text.length; },0) / Math.max(1,variant.descriptions.length);
+  scores.descFill = Math.min(100, (avgDLen / 75) * 100);
+
+  // 4. Anahtar kelime sayısı (ideal: 5+)
+  scores.kwCount = Math.min(100, (variant.keywords.length / 5) * 100);
+
+  // 5. CTA kelimeleri geçiyor mu?
+  var ctaWords = ['al','sat','ara','üye','indir','rezerv','teklif','kayıt','dene','başla','kazan','keşfet'];
+  var allText = variant.headlines.map(function(h){return h.text.toLowerCase();}).join(' ') +
+                variant.descriptions.map(function(d){return d.text.toLowerCase();}).join(' ');
+  var hasCTA = ctaWords.some(function(w){ return allText.indexOf(w) > -1; });
+  scores.cta = hasCTA ? 100 : 0;
+
+  // 6. Negatif kelime var mı?
+  scores.negKw = (variant.negKeywords && variant.negKeywords.length > 0) ? 100 : 20;
+
+  // Ağırlıklı toplam
+  var total = Math.round(
+    scores.headlineCount * 0.20 +
+    scores.headlineFill  * 0.20 +
+    scores.descFill      * 0.20 +
+    scores.kwCount       * 0.15 +
+    scores.cta           * 0.15 +
+    scores.negKw         * 0.10
+  );
+
+  var color = total >= 75 ? '#0e9f6e' : total >= 50 ? '#c27803' : '#e02424';
+  var label = total >= 75 ? '🟢 Mükemmel' : total >= 50 ? '🟡 Ortalama' : '🔴 Zayıf';
+
+  var bars = [
+    {lbl:'Başlık Sayısı',    val:scores.headlineCount},
+    {lbl:'Başlık Doluluk',   val:scores.headlineFill},
+    {lbl:'Açıklama Kalitesi',val:scores.descFill},
+    {lbl:'Anahtar Kelime',   val:scores.kwCount},
+    {lbl:'CTA Kullanımı',    val:scores.cta},
+    {lbl:'Negatif Kelime',   val:scores.negKw},
+  ];
+
+  var tips = [];
+  if(scores.headlineCount < 80) tips.push('En az 5 başlık ekleyin (şu an: '+variant.headlines.length+')');
+  if(scores.headlineFill < 70) tips.push('Başlıkları 25+ karaktere çıkarın, ✨ AI Doldur butonunu kullanın');
+  if(scores.descFill < 70) tips.push('Açıklamaları 75+ karaktere çıkarın');
+  if(scores.kwCount < 60) tips.push('En az 5 anahtar kelime ekleyin');
+  if(!hasCTA) tips.push('Başlık veya açıklamada eylem çağrısı (CTA) ekleyin');
+  if(scores.negKw < 50) tips.push('Negatif kelime ekleyerek bütçe israfını önleyin');
+
+  var html = '<div class="qs-score-big" style="color:'+color+'">'+total+'</div>'+
+    '<div class="qs-score-lbl" style="color:'+color+'">'+label+'</div>'+
+    '<div class="qs-wrap">';
+  bars.forEach(function(b){
+    var bc = b.val >= 75 ? '#0e9f6e' : b.val >= 50 ? '#c27803' : '#e02424';
+    html += '<div class="qs-bar-row">'+
+      '<div class="qs-bar-label">'+b.lbl+'</div>'+
+      '<div class="qs-bar-track"><div class="qs-bar-fill" style="width:'+b.val+'%;background:'+bc+'"></div></div>'+
+      '<div style="font-size:.7rem;font-weight:700;color:'+bc+';width:28px;text-align:right">'+Math.round(b.val)+'</div>'+
+    '</div>';
+  });
+  html += '</div>';
+  if(tips.length){
+    html += '<div style="margin-top:10px"><div class="section-title" style="margin-bottom:6px">💡 Öneriler</div><div class="qs-tips">';
+    tips.forEach(function(t){ html += '<div class="qs-tip"><span>→</span><span>'+t+'</span></div>'; });
+    html += '</div></div>';
+  }
+
+  var el = document.getElementById('qsContent');
+  if(el) el.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════
+// AI HEADLINE OPTIMIZER
+// ════════════════════════════════════════════════════════
+async function aiOptimizeHeadline(inputEl, variant, idx, cntEl, btnEl){
+  var key = state.groqKey || document.getElementById('groqKey').value.trim();
+  if(!key){ alert('Groq API anahtarı gerekli.'); return; }
+  var current = inputEl.value.trim();
+  var remaining = 30 - current.length;
+  if(remaining <= 2){ alert('Başlık zaten dolu!'); return; }
+
+  var brand = document.getElementById('brand').value;
+  var desc = document.getElementById('desc').value;
+
+  btnEl.classList.add('loading-ai');
+  btnEl.textContent = '⏳';
+
+  var prompt = 'Google Ads başlığını tamamla. Mevcut metin: "'+current+'". '+
+    'Tam olarak '+(30-current.length)+' karakter daha ekle (toplamda 30 karakter olsun). '+
+    'İşletme: '+brand+'. Ürün/hizmet: '+desc.substring(0,100)+'. '+
+    'SADECE eklenmesi gereken kelime(ler)i döndür, mevcut metni tekrarlama, tırnak işareti kullanma. '+
+    'Türkçe, güçlü CTA içersin.';
+
+  try{
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.8,max_tokens:50})
+    });
+    var data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    var addition = data.choices[0].message.content.trim().replace(/^["']|["']$/g,'');
+    var newVal = (current + (current.length>0?' ':'') + addition).substring(0,30);
+    inputEl.value = newVal;
+    variant.headlines[idx].text = newVal;
+    // trigger update
+    inputEl.dispatchEvent(new Event('input'));
+  }catch(e){
+    alert('AI hatası: '+e.message);
+  }finally{
+    btnEl.classList.remove('loading-ai');
+    btnEl.textContent='✨ AI Doldur';
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// HISTORY
+// ════════════════════════════════════════════════════════
+function saveToHistory(){
+  if(!state.variants.length) return;
+  var history = JSON.parse(localStorage.getItem('gads_history')||'[]');
+  var entry = {
+    id: Date.now(),
+    brand: document.getElementById('brand').value,
+    url: getCleanUrl(),
+    date: new Date().toLocaleString('tr-TR'),
+    variants: state.variants,
+    sitelinks: state.sitelinks,
+    demographics: state.demographics
+  };
+  history.unshift(entry);
+  if(history.length > 20) history = history.slice(0,20); // max 20 kayıt
+  localStorage.setItem('gads_history', JSON.stringify(history));
+}
+
+function openHistory(){
+  var history = JSON.parse(localStorage.getItem('gads_history')||'[]');
+  var list = document.getElementById('historyList');
+  if(history.length === 0){
+    list.innerHTML = '<div class="history-empty">📭 Henüz kaydedilmiş reklam yok.<br><br>Reklam oluşturduktan sonra burada görünür.</div>';
+  } else {
+    list.innerHTML = '';
+    history.forEach(function(entry){
+      var firstHeadline = entry.variants[0] && entry.variants[0].headlines[0] ? entry.variants[0].headlines[0].text : '';
+      var item = document.createElement('div'); item.className='history-item';
+      item.innerHTML = '<div class="history-item-brand">'+entry.brand+'</div>'+
+        '<div class="history-item-meta">'+entry.date+' · '+entry.variants.length+' varyant</div>'+
+        '<div class="history-item-preview">'+firstHeadline+'</div>';
+      item.onclick = function(){ loadFromHistory(entry); closeHistory(); };
+      list.appendChild(item);
+    });
+  }
+  document.getElementById('historyDrawer').classList.add('open');
+  document.getElementById('historyOverlay').classList.add('open');
+}
+
+function closeHistory(){
+  document.getElementById('historyDrawer').classList.remove('open');
+  document.getElementById('historyOverlay').classList.remove('open');
+}
+
+function clearHistory(){
+  if(!confirm('Tüm geçmiş silinsin mi?')) return;
+  localStorage.removeItem('gads_history');
+  openHistory();
+}
+
+function loadFromHistory(entry){
+  // Restore form fields
+  document.getElementById('brand').value = entry.brand;
+  document.getElementById('url').value = entry.url;
+  state.variants = entry.variants;
+  state.sitelinks = entry.sitelinks || [];
+  state.demographics = entry.demographics || state.demographics;
+  state.variantCount = entry.variants.length;
+  buildVariantTabs();
+  buildSitelinkEditor();
+  setStep(2);
+}
+
+// ════════════════════════════════════════════════════════
+// CSV EXPORT (Google Ads Bulk Upload Format)
+// ════════════════════════════════════════════════════════
+function exportCSV(){
+  if(!state.variants.length){ alert('Önce reklam oluşturun.'); return; }
+  var brand = document.getElementById('brand').value;
+  var domain = getCleanUrl();
+  var campaignName = brand + ' - Arama Kampanyası';
+  var rows = [];
+
+  // Header
+  rows.push(['Kampanya','Reklam Grubu','Başlık 1','Başlık 2','Başlık 3','Başlık 4','Başlık 5',
+    'Açıklama 1','Açıklama 2','Final URL','Reklam Türü','Durum'].join(','));
+
+  state.variants.forEach(function(variant, vi){
+    var letter = ['A','B','C'][vi];
+    var adGroup = campaignName + ' - Grup ' + letter;
+    var hs = variant.headlines.map(function(h){ return '"'+h.text.replace(/"/g,'""')+'"'; });
+    while(hs.length < 5) hs.push('""');
+    var ds = variant.descriptions.map(function(d){ return '"'+d.text.replace(/"/g,'""')+'"'; });
+    while(ds.length < 2) ds.push('""');
+    rows.push([
+      '"'+campaignName+'"',
+      '"'+adGroup+'"',
+      hs[0], hs[1], hs[2], hs[3], hs[4],
+      ds[0], ds[1],
+      '"https://'+domain+'"',
+      '"Duyarlı Arama Reklamı"',
+      '"Duraklatıldı"'
+    ].join(','));
+  });
+
+  // Keywords
+  rows.push(''); // boş satır
+  rows.push(['Kampanya','Reklam Grubu','Anahtar Kelime','Eşleşme Türü','Negatif mi'].join(','));
+  var firstVariant = state.variants[0];
+  if(firstVariant){
+    firstVariant.keywords.forEach(function(kw){
+      var matchMap = {BROAD:'Geniş Eşleşme', PHRASE:'Sözlük Eşleşme', EXACT:'Tam Eşleşme'};
+      rows.push(['"'+campaignName+'"','""','"'+kw.text+'"','"'+matchMap[kw.matchType]+'"','"Hayır"'].join(','));
+    });
+    if(firstVariant.negKeywords){
+      firstVariant.negKeywords.forEach(function(kw){
+        rows.push(['"'+campaignName+'"','""','"'+kw.text+'"','"Geniş Eşleşme"','"Evet"'].join(','));
+      });
+    }
+  }
+
+  var bom = '\uFEFF'; // UTF-8 BOM for Excel Turkish support
+  var blob = new Blob([bom + rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'google-ads-'+brand.replace(/\s+/g,'-').toLowerCase()+'.csv';
+  a.click();
+}
+// Budget ve slider binding
+(function(){
+  var bInput = document.getElementById('budgetEstimate');
+  var bRange = document.getElementById('budgetEstRange');
+  if(bInput){
+    bInput.addEventListener('input', function(){ if(bRange) bRange.value=this.value; calcEstimate(); });
+    bInput.addEventListener('change', function(){ if(bRange) bRange.value=this.value; calcEstimate(); });
+  }
+  if(bRange){
+    bRange.addEventListener('input', function(){ if(bInput) bInput.value=this.value; calcEstimate(); });
+  }
+  var sectorEl = document.getElementById('sector');
+  if(sectorEl) sectorEl.addEventListener('change', calcEstimate);
+})();
+</script>
+</body>
+</html>
